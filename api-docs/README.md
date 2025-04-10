@@ -1,14 +1,17 @@
-# API Documentation Frontend
+# RatherChat API Documentation Frontend
 
-A Vue 3 desktop application for displaying and managing API documentation. Built with modern web technologies and best practices for maintainability and extensibility.
+A Vue 3 desktop application for displaying and managing RatherChat's API documentation. Built with modern web technologies and best practices for maintainability and extensibility.
 
 ## 🚀 Features
 
-- Modern, responsive desktop interface
+- Modern, professional dark theme interface
 - Interactive API endpoint documentation
-- Code examples and snippets
-- Search functionality (coming soon)
-- Dark/Light theme support (coming soon)
+- OpenAPI 3.1.0 specification support
+- Real-time endpoint search filtering
+- Color-coded HTTP methods
+- Expandable endpoint details
+- JSON response examples
+- Terms of Service documentation
 
 ## 🛠️ Tech Stack
 
@@ -39,50 +42,71 @@ npm run build
 ## 📚 Documentation
 
 Find detailed documentation in the `docs` folder:
-
 - `context.md` - Project context and progress
-- `STYLE_GUIDE.md` - CSS and styling guidelines
-- `PROJECT_STRUCTURE.md` - Codebase organization
+- `endpoints.yaml` - OpenAPI specification
+- `tos.md` - Terms of Service
 
 ## 🏗️ Project Structure
 
 ```
 api-docs/
-├── docs/                # Project documentation
+├── public/
+│   ├── endpoints.yaml    # OpenAPI specification
+│   ├── tos.md           # Terms of Service
+│   ├── rc_white_logo.png
+│   └── fb_1.jpg
 ├── src/
-│   ├── assets/         # Static assets and styles
-│   ├── components/     # Vue components
-│   └── App.vue        # Root component
-└── package.json       # Dependencies and scripts
+│   ├── components/
+│   │   └── layout/
+│   │       ├── AppHeader/  # Logo, search, and schema download
+│   │       ├── AppInfo/    # Project info and metadata
+│   │       └── AppMain/    # API endpoints display
+│   ├── assets/
+│   │   └── styles/        # SCSS variables and mixins
+│   └── App.vue
+└── docs/
+    └── context.md         # Project documentation
 ```
-
-See `docs/PROJECT_STRUCTURE.md` for detailed structure information.
 
 ## 🧩 Components
 
-The application is built using a modular component architecture:
+### AppHeader
+- Project logo display
+- Real-time search functionality
+- Schema download button
 
-- Layout components (Header, Sidebar, Main, Footer)
-- Common components (Button, Card, Search)
-- API-specific components (EndpointList, EndpointDetail, CodeExample)
+### AppInfo
+- Project name and version display
+- OpenAPI version information
+- Project description
+- Terms of Service link
+- Developer contact button
+
+### AppMain
+- API endpoint listing
+- Color-coded HTTP methods
+- Expandable endpoint details
+- JSON response examples
+- Search result filtering
 
 ## 🎨 Styling
 
-We use SCSS modules with a well-structured architecture:
-- Component-scoped styles
-- Global variables and mixins
-- Responsive design
+We use SCSS modules with a professional dark theme:
+- 80vw content width for optimal readability
+- Left-aligned content for consistency
+- Color-coded HTTP methods for quick identification
+- Smooth transitions for expandable sections
+- Monospace fonts for code examples
 - Consistent spacing system
 
-See `docs/STYLE_GUIDE.md` for detailed styling guidelines.
+## 🔜 Upcoming Features
 
-## 🤝 Contributing
-
-1. Follow the style guide
-2. Write descriptive commit messages
-3. Update documentation as needed
-4. Test your changes thoroughly
+1. Complete OpenAPI specification integration
+2. Enhanced search capabilities
+3. Response schema documentation
+4. Proper error handling
+5. Additional interactive features
 
 ## 📝 License
 
-[Your License] [Your Organization]
+[Your License] 2025 RatherChat
