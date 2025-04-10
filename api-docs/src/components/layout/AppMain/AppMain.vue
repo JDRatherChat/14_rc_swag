@@ -2,11 +2,11 @@
 import { ref, computed } from 'vue'
 
 const searchQuery = ref('')
+const expandedEndpoints = ref(new Set())
 
 const endpoints = [
   {
     id: 'list-users',
-    name: 'List Users',
     method: 'GET',
     path: '/api/v1/users',
     description: 'Returns a list of users with pagination support.',
@@ -19,7 +19,7 @@ const endpoints = [
       { 
         code: '200', 
         description: 'Returns array of users', 
-        type: 'array',
+        type: 'success',
         example: {
           users: [
             {
@@ -65,56 +65,53 @@ const endpoints = [
       { name: 'id', type: 'string', required: true, description: 'The unique identifier of the user' }
     ],
     responses: [
-      { code: '200', description: 'Success - Returns user object', type: 'array', example: { data: {} } },
+      { code: '200', description: 'Success - Returns user object', type: 'success', example: { data: {} } },
       { code: '404', description: 'User not found', type: 'error' },
       { code: '401', description: 'Unauthorized', type: 'error' }
     ]
   }
 ]
 
-const expandedEndpoints = ref(new Set())
-
 const filteredEndpoints = computed(() => {
   if (!searchQuery.value) return endpoints
-  
   const query = searchQuery.value.toLowerCase()
   return endpoints.filter(endpoint => 
-    endpoint.name.toLowerCase().includes(query) ||
     endpoint.path.toLowerCase().includes(query) ||
+    endpoint.description.toLowerCase().includes(query) ||
     endpoint.method.toLowerCase().includes(query) ||
-    endpoint.description.toLowerCase().includes(query)
+    endpoint.name?.toLowerCase().includes(query)
   )
 })
 
-const toggleEndpoint = (id) => {
-  const newExpanded = new Set(expandedEndpoints.value)
-  if (newExpanded.has(id)) {
-    newExpanded.delete(id)
+function toggleEndpoint(id) {
+  const newSet = new Set(expandedEndpoints.value)
+  if (newSet.has(id)) {
+    newSet.delete(id)
   } else {
-    newExpanded.add(id)
+    newSet.add(id)
   }
-  expandedEndpoints.value = newExpanded
+  expandedEndpoints.value = newSet
 }
 
-const isExpanded = (id) => expandedEndpoints.value.has(id)
+function isExpanded(id) {
+  return expandedEndpoints.value.has(id)
+}
 
-const getMethodColor = (method) => {
+function getMethodColor(method) {
   const colors = {
-    GET: '#4CAF50',    // Green
-    POST: '#FF9800',   // Orange
-    PUT: '#2196F3',    // Blue
-    DELETE: '#F44336', // Red
-    PATCH: '#9C27B0'   // Purple
+    GET: '#4CAF50',
+    POST: '#FF9800',
+    PUT: '#2196F3',
+    DELETE: '#F44336',
+    PATCH: '#9C27B0'
   }
   return colors[method] || '#757575'
 }
 
-const onSearch = (query) => {
-  searchQuery.value = query
-}
-
 defineExpose({
-  onSearch
+  setSearchQuery: (query) => {
+    searchQuery.value = query
+  }
 })
 </script>
 
@@ -175,7 +172,7 @@ defineExpose({
                 :class="$style.response"
               >
                 <div :class="$style.responseHeader">
-                  <div :class="[$style.responseCode, response.code.startsWith('2') ? $style.success : $style.error]">
+                  <div :class="[$style.responseCode, response.type === 'success' ? $style.success : $style.error]">
                     {{ response.code }}
                   </div>
                   <div :class="$style.responseTitle">
@@ -217,7 +214,7 @@ defineExpose({
 .endpoint {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: $border-radius-lg;
-  @include shadow-sm;
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
 }
 
@@ -236,7 +233,7 @@ defineExpose({
 
 .endpointHeaderContent {
   flex: 1;
-  min-width: 0; // Enables text truncation
+  min-width: 0;
 }
 
 .methodPath {
@@ -398,7 +395,7 @@ defineExpose({
 }
 
 .responseExampleContainer {
-  padding-left: calc($spacing-md + 48px + $spacing-md); // responseCode width + padding
+  padding-left: calc($spacing-md + 48px + $spacing-md);
   text-align: left;
   width: 100%;
 }
