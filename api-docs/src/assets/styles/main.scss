@@ -1,0 +1,40 @@
+@import 'variables';
+@import 'mixins';
+@import 'reset';
+
+// Global styles
+:root {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+// Utility classes
+.container {
+  @include grid-container;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Layout classes
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  grid-template-columns: $sidebar-width 1fr;
+  grid-template-rows: $header-height 1fr;
+  height: 100vh;
+}
