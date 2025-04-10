@@ -200,16 +200,17 @@ defineExpose({
   min-height: calc(100vh - $header-height);
   background-color: $background-color;
   overflow-y: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .container {
   padding: $spacing-xl;
-  max-width: $container-max-width;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
   padding-left: calc($spacing-xl + 32px + #{$spacing-sm}); /* Add logo width to padding */
+  width: 80vw;
 }
 
 .endpoint {
