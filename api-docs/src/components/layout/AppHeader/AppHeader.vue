@@ -20,7 +20,10 @@ function handleSearch(event) {
 <template>
   <header :class="$style.header">
     <div :class="$style.container">
-      <h1 :class="$style.title">API Documentation</h1>
+      <div :class="$style.titleContainer">
+        <img src="/rc_white_logo.png" alt="RatherChat Logo" :class="$style.logo" />
+        <h1 :class="$style.title">RatherChat API Documentation</h1>
+      </div>
       <a :class="$style.downloadButton" href="/openapi.yaml" download>
         Download Schema
       </a>
@@ -61,11 +64,23 @@ function handleSearch(event) {
   gap: $spacing-xl;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+  margin-right: $spacing-sm;
+}
+
 .title {
   font-size: $font-size-xl;
   color: $text-color;
   margin: 0;
-  flex: 1;
 }
 
 .downloadButton {
