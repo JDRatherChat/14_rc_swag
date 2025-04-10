@@ -209,13 +209,17 @@ defineExpose({
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  padding-left: calc($spacing-xl + 32px + #{$spacing-sm}); /* Add logo width to padding */
 }
 
 .endpoint {
+  position: relative;
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: $border-radius-lg;
   box-shadow: $shadow-sm;
   border: 1px solid $border-color;
+  margin-left: calc(-32px - #{$spacing-sm}); /* Pull back by logo width */
+  width: calc(100% + 32px + #{$spacing-sm}); /* Extend width to compensate for margin */
 }
 
 .endpointHeader {
@@ -231,87 +235,19 @@ defineExpose({
   }
 }
 
-.endpointHeaderContent {
-  flex: 1;
-  min-width: 0;
-}
-
-.methodPath {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  overflow: hidden;
-}
-
-.method {
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $border-radius-sm;
-  color: white;
-  font-weight: 600;
-  font-size: $font-size-sm;
-  min-width: 60px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.path {
-  color: $text-color;
-  font-family: monospace;
-  font-size: $font-size-md;
-  flex-shrink: 0;
-}
-
-.arrow {
-  color: rgba($text-color, 0.5);
-  margin: 0 $spacing-sm;
-  flex-shrink: 0;
-}
-
-.description {
-  color: rgba($text-color, 0.7);
-  font-size: $font-size-md;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.toggleButton {
-  background: none;
-  border: none;
-  color: $text-color;
-  padding: $spacing-xs;
-  cursor: pointer;
-  transition: transform $transition-fast;
-  flex-shrink: 0;
-
-  &.expanded {
-    transform: rotate(180deg);
-  }
-
-  &:hover {
-    color: $secondary-color;
-  }
-}
-
 .endpointContent {
   border-top: 1px solid $border-color;
+  padding: $spacing-xl;
 }
 
 .section {
-  padding: $spacing-xl;
+  padding-bottom: $spacing-xl;
   border-bottom: 1px solid $border-color;
 
   &:last-child {
     border-bottom: none;
+    padding-bottom: 0;
   }
-}
-
-.sectionTitle {
-  font-size: $font-size-lg;
-  color: $text-color;
-  margin-bottom: $spacing-lg;
-  text-align: left;
-  font-weight: 600;
 }
 
 .table {
@@ -395,9 +331,8 @@ defineExpose({
 }
 
 .responseExampleContainer {
-  padding-left: calc($spacing-md + 48px + $spacing-md);
-  text-align: left;
   width: 100%;
+  text-align: left;
 }
 
 .responseExample {
@@ -408,12 +343,71 @@ defineExpose({
   font-size: $font-size-sm;
   margin: 0;
   text-align: left;
+  width: 100%;
+  box-sizing: border-box;
   
   code {
     white-space: pre;
     color: $text-color;
     text-align: left;
     display: block;
+  }
+}
+
+.methodPath {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  overflow: hidden;
+}
+
+.method {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  color: white;
+  font-weight: 600;
+  font-size: $font-size-sm;
+  min-width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.path {
+  color: $text-color;
+  font-family: monospace;
+  font-size: $font-size-md;
+  flex-shrink: 0;
+}
+
+.arrow {
+  color: rgba($text-color, 0.5);
+  margin: 0 $spacing-sm;
+  flex-shrink: 0;
+}
+
+.description {
+  color: rgba($text-color, 0.7);
+  font-size: $font-size-md;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toggleButton {
+  background: none;
+  border: none;
+  color: $text-color;
+  padding: $spacing-xs;
+  cursor: pointer;
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+
+  &:hover {
+    color: $secondary-color;
   }
 }
 </style>

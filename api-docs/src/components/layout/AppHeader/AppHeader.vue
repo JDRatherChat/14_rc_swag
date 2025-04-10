@@ -75,6 +75,7 @@ function handleSearch(event) {
   height: 32px;
   width: auto;
   margin-right: $spacing-sm;
+  min-width: 32px;
 }
 
 .title {
