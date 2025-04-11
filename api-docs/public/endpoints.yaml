@@ -1,6 +1,6 @@
 openapi: 3.1.1
 info:
-  title: "RatherChat API"
+  title: "Test API"
   version: "1.0.0"
   description: "RatherChat's API documentation for managing users, chats, and messages."
   termsOfService: "/tos.md"
@@ -18,7 +18,7 @@ servers:
 paths:
   /users:
     get:
-      summary: List all users
+      summary: Testing the yaml
       description: Retrieve a paginated list of users
       operationId: listUsers
       parameters:
@@ -42,6 +42,17 @@ paths:
       responses:
         '200':
           description: A list of users
+          content:
+            application/json:
+              example:
+                users:
+                  - id: "123"
+                    username: "john_doe"
+                    email: "john@example.com"
+                total: 50
+                page: 1
+        '404':
+          description: Bad Request
           content:
             application/json:
               example:

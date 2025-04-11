@@ -2,17 +2,13 @@
 import { ref, computed } from 'vue'
 import { useOpenApi } from '../../../composables/useOpenApi'
 
-const { loading, error, getEndpoints } = useOpenApi()
+const { loading, error, getEndpoints, toggleEndpoint } = useOpenApi()
 const searchQuery = ref('')
 
 const endpoints = computed(() => getEndpoints())
 
 function setSearchQuery(query) {
   searchQuery.value = query
-}
-
-function toggleEndpoint(endpoint) {
-  endpoint.expanded = !endpoint.expanded
 }
 
 const filteredEndpoints = computed(() => {
@@ -27,16 +23,25 @@ const filteredEndpoints = computed(() => {
 })
 
 const methodColors = {
-  GET: '#4CAF50',
-  POST: '#FF9800',
-  PUT: '#2196F3',
-  DELETE: '#F44336',
-  PATCH: '#9C27B0'
+  GET: '#2196F3',    // Light blue
+  POST: '#4CAF50',   // Green
+  PUT: '#FF9800',    // Orange
+  DELETE: '#F44336', // Red
+  PATCH: '#9C27B0'   // Purple
 }
 
 const getMethodBackgroundColor = (method) => {
   const color = methodColors[method]
   return color ? `${color}10` : 'transparent' // 10 is hex for 6% opacity
+}
+
+const getResponseClass = (status) => {
+  const statusCode = parseInt(status)
+  if (statusCode >= 200 && statusCode < 300) return '$style.success'
+  if (statusCode >= 300 && statusCode < 400) return '$style.redirect'
+  if (statusCode >= 400 && statusCode < 500) return '$style.clientError'
+  if (statusCode >= 500) return '$style.serverError'
+  return ''
 }
 
 defineExpose({ setSearchQuery, getMethodBackgroundColor })
@@ -79,8 +84,14 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
                     <span v-if="param.required" :class="$style.required">*</span>
                   </div>
                   <div :class="$style.parameterDetails">
-                    <div :class="$style.parameterType">{{ param.schema?.type || param.type }}</div>
+                    <div :class="$style.parameterType">
+                      {{ param.in }} - {{ param.schema?.type || param.type }}
+                      <span v-if="param.schema?.format">({{ param.schema.format }})</span>
+                    </div>
                     <div :class="$style.parameterDescription">{{ param.description }}</div>
+                    <div v-if="param.schema?.default" :class="$style.parameterDefault">
+                      Default: {{ param.schema.default }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -93,7 +104,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
                 <div v-for="(schema, contentType) in endpoint.requestBody.content" :key="contentType">
                   <div :class="$style.contentType">{{ contentType }}</div>
                   <pre v-if="schema.example" :class="$style.example">
-                    <code>{{ JSON.stringify(schema.example, null, 2) }}</code>
+                    <code>{{ JSON.stringify(schema.example, null, 2).trim() }}</code>
                   </pre>
                 </div>
               </div>
@@ -104,7 +115,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
               <h3 :class="$style.sectionTitle">Responses</h3>
               <div :class="$style.responses">
                 <div v-for="response in endpoint.responses" :key="response.status" :class="$style.response">
-                  <div :class="$style.responseHeader">
+                  <div :class="[$style.responseHeader, getResponseClass(response.status)]">
                     <div :class="$style.responseStatus">{{ response.status }}</div>
                     <div :class="$style.responseDescription">{{ response.description }}</div>
                   </div>
@@ -112,7 +123,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
                     <div v-for="(schema, contentType) in response.content" :key="contentType">
                       <div :class="$style.contentType">{{ contentType }}</div>
                       <pre v-if="schema.example" :class="$style.example">
-                        <code>{{ JSON.stringify(schema.example, null, 2) }}</code>
+                        <code>{{ JSON.stringify(schema.example, null, 2).trim() }}</code>
                       </pre>
                     </div>
                   </div>
@@ -250,6 +261,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 .section {
   padding-bottom: $spacing-xl;
   border-bottom: 1px solid $border-color;
+  text-align: left;
 
   &:last-child {
     border-bottom: none;
@@ -262,12 +274,14 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   color: $text-color;
   margin-bottom: $spacing-lg;
   font-weight: 600;
+  text-align: left;
 }
 
 .parameters {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+  text-align: left;
 }
 
 .parameter {
@@ -276,6 +290,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   padding: $spacing-md;
   background-color: rgba($text-color, 0.05);
   border-radius: $border-radius-md;
+  text-align: left;
 }
 
 .parameterName {
@@ -283,6 +298,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   font-family: monospace;
   color: $text-color;
   font-weight: 600;
+  text-align: left;
 }
 
 .required {
@@ -292,29 +308,41 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 
 .parameterDetails {
   flex: 1;
+  text-align: left;
 }
 
 .parameterType {
   font-size: $font-size-sm;
   color: $secondary-color;
   margin-bottom: $spacing-xs;
+  text-align: left;
 }
 
 .parameterDescription {
   color: rgba($text-color, 0.7);
   font-size: $font-size-sm;
+  text-align: left;
+}
+
+.parameterDefault {
+  color: rgba($text-color, 0.6);
+  font-size: $font-size-sm;
+  font-style: italic;
+  margin-top: $spacing-xs;
 }
 
 .responses {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  text-align: left;
 }
 
 .response {
   background-color: rgba($text-color, 0.05);
   border-radius: $border-radius-md;
   overflow: hidden;
+  text-align: left;
 }
 
 .responseHeader {
@@ -323,21 +351,25 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   gap: $spacing-md;
   padding: $spacing-md;
   background-color: rgba($text-color, 0.1);
+  text-align: left;
 }
 
 .responseStatus {
   font-family: monospace;
   font-weight: 600;
   color: $secondary-color;
+  text-align: left;
 }
 
 .responseDescription {
   color: rgba($text-color, 0.9);
   font-size: $font-size-sm;
+  text-align: left;
 }
 
 .responseContent {
   padding: $spacing-md;
+  text-align: left;
 }
 
 .contentType {
@@ -345,6 +377,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   font-size: $font-size-sm;
   color: rgba($text-color, 0.7);
   margin-bottom: $spacing-sm;
+  text-align: left;
 }
 
 .example {
@@ -355,10 +388,42 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   font-size: $font-size-sm;
   margin: 0;
   overflow-x: auto;
+  text-align: left;
   
   code {
     white-space: pre;
     color: $text-color;
+    text-align: left;
+    display: block;
+    padding: 0;
+  }
+}
+
+.success {
+  background-color: rgba($secondary-color, 0.1) !important;
+  .responseStatus {
+    color: $secondary-color !important;
+  }
+}
+
+.clientError {
+  background-color: rgba(#f44336, 0.1) !important;
+  .responseStatus {
+    color: #f44336 !important;
+  }
+}
+
+.serverError {
+  background-color: rgba(#ff9800, 0.1) !important;
+  .responseStatus {
+    color: #ff9800 !important;
+  }
+}
+
+.redirect {
+  background-color: rgba(#9c27b0, 0.1) !important;
+  .responseStatus {
+    color: #9c27b0 !important;
   }
 }
 </style>
