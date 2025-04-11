@@ -13,14 +13,11 @@ servers:
     description: Base URL
 
 tags:
-  - name: Pets
+  - name: Pet
     description: Everything about your Pets
-    externalDocs:
-      description: Find out more
-      url: http://rather.chat/api/pets
   - name: Store
     description: Access to Pet store orders
-  - name: Users
+  - name: User
     description: Operations about users
 
 paths:
@@ -50,7 +47,7 @@ paths:
         type: "string"
       - name: "file"
         in: "formData"
-        description: "file to upload"
+        description: "File to upload"
         required: false
         type: "file"
       responses:

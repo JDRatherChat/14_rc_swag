@@ -56,11 +56,15 @@ export function useOpenApi() {
 
   // Format responses for better display
   const formatResponses = (responses = {}) => {
-    return Object.entries(responses).map(([status, details]) => ({
-      status,
-      description: details.description,
-      content: details.content
-    }))
+    return Object.entries(responses).reduce((acc, [status, details]) => {
+      acc[status] = {
+        status,
+        description: details.description,
+        content: details.content,
+        headers: details.headers
+      }
+      return acc
+    }, {})
   }
 
   // Process and store endpoints
@@ -69,17 +73,27 @@ export function useOpenApi() {
 
     const processed = []
     const paths = apiSpec.value.paths || {}
+    const tagDescriptions = {}
+
+    // First, collect tag descriptions
+    apiSpec.value.tags?.forEach(tag => {
+      tagDescriptions[tag.name.toLowerCase()] = tag.description
+    })
 
     for (const [path, methods] of Object.entries(paths)) {
       for (const [method, details] of Object.entries(methods)) {
         // Skip if it's a parameter object
         if (method === 'parameters') continue
 
+        const tags = details.tags || ['Other']
+        
         processed.push({
           path,
           method: method.toUpperCase(),
+          tags,
+          tagDescription: tagDescriptions[tags[0]?.toLowerCase()],
           summary: details.summary,
-          description: details.description,
+          description: details.description || details.summary,
           operationId: details.operationId,
           // Combine path-level and operation-level parameters
           parameters: formatParameters([
@@ -93,48 +107,19 @@ export function useOpenApi() {
           } : null,
           responses: formatResponses(details.responses),
           deprecated: details.deprecated || false,
-          expanded: false // UI state for expandable sections
+          security: details.security,
+          expanded: false
         })
       }
     }
 
-    // Sort endpoints by path for better organization
-    endpoints.value = processed.sort((a, b) => a.path.localeCompare(b.path))
+    // Sort endpoints by path
+    processed.sort((a, b) => a.path.localeCompare(b.path))
+    endpoints.value = processed
   }
 
-  // Get endpoints (now returns the ref)
-  const getEndpoints = () => {
-    if (!apiSpec.value?.paths) return [];
-
-    const endpoints = [];
-    const paths = apiSpec.value.paths;
-
-    Object.entries(paths).forEach(([path, methods]) => {
-      Object.entries(methods).forEach(([method, details]) => {
-        if (method === 'parameters') return; // Skip common parameters
-
-        endpoints.push({
-          path,
-          method: method.toUpperCase(),
-          tags: details.tags || [],
-          summary: details.summary,
-          description: details.description,
-          parameters: [
-            ...(paths[path].parameters || []), // Common parameters
-            ...(details.parameters || [])
-          ],
-          requestBody: details.requestBody,
-          responses: Object.entries(details.responses).map(([status, response]) => ({
-            status,
-            ...response
-          })),
-          expanded: false
-        });
-      });
-    });
-
-    return endpoints;
-  }
+  // Get endpoints
+  const getEndpoints = () => endpoints.value
 
   // Toggle endpoint expansion
   const toggleEndpoint = (endpoint) => {
@@ -165,6 +150,7 @@ export function useOpenApi() {
   return {
     loading,
     error,
+    apiSpec,
     getApiInfo,
     getEndpoints,
     toggleEndpoint,

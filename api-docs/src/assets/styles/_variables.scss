@@ -6,6 +6,12 @@ $background-color: #1a1f36;  // Dark blue background
 $text-color: #ffffff;        // White text for dark background
 $border-color: rgba(255, 255, 255, 0.1);  // Subtle white border
 
+// Status Colors
+$success-color: #4caf50;    // Green
+$warning-color: #ff9800;    // Orange
+$error-color: #f44336;      // Red
+$info-color: #2196f3;       // Blue
+
 // Typography
 $font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
 $font-size-base: 16px;

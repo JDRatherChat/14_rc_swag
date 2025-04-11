@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useOpenApi } from '../../../composables/useOpenApi'
 
-const { loading, error, getEndpoints } = useOpenApi()
+const { loading, error, getEndpoints, apiSpec } = useOpenApi()
 const searchQuery = ref('')
 
 const endpoints = computed(() => getEndpoints())
@@ -10,6 +10,14 @@ const endpoints = computed(() => getEndpoints())
 function setSearchQuery(query) {
   searchQuery.value = query
 }
+
+const tagDescriptions = computed(() => {
+  const descriptions = {};
+  apiSpec.value?.tags?.forEach(tag => {
+    descriptions[tag.name.toLowerCase()] = tag.description;
+  });
+  return descriptions;
+});
 
 const filteredEndpoints = computed(() => {
   const query = searchQuery.value.toLowerCase()
@@ -24,12 +32,16 @@ const filteredEndpoints = computed(() => {
 
 const groupEndpointsByTag = computed(() => {
   const groups = {};
+  
   endpoints.value.forEach(endpoint => {
     const tag = endpoint.tags?.[0] || 'Other';
     if (!groups[tag]) {
-      groups[tag] = [];
+      groups[tag] = {
+        endpoints: [],
+        description: tagDescriptions.value[tag.toLowerCase()]
+      };
     }
-    groups[tag].push(endpoint);
+    groups[tag].endpoints.push(endpoint);
   });
   return groups;
 });
@@ -38,15 +50,18 @@ const filteredGroups = computed(() => {
   const query = searchQuery.value.toLowerCase();
   const groups = {};
 
-  Object.entries(groupEndpointsByTag.value).forEach(([tag, endpoints]) => {
-    const filteredEndpoints = endpoints.filter(endpoint =>
+  Object.entries(groupEndpointsByTag.value).forEach(([tag, group]) => {
+    const filteredEndpoints = group.endpoints.filter(endpoint =>
       endpoint.path.toLowerCase().includes(query) ||
       endpoint.description?.toLowerCase().includes(query) ||
       endpoint.method.toLowerCase().includes(query)
     );
 
     if (filteredEndpoints.length > 0) {
-      groups[tag] = filteredEndpoints;
+      groups[tag] = {
+        endpoints: filteredEndpoints,
+        description: group.description
+      };
     }
   });
 
@@ -91,7 +106,7 @@ const methodColors = {
 
 const getMethodBackgroundColor = (method) => {
   const color = methodColors[method]
-  return color ? `${color}10` : 'transparent' // 10 is hex for 6% opacity
+  return color ? `${color}20` : 'transparent' // 10 is hex for 6% opacity
 }
 
 const getResponseClass = (status) => {
@@ -113,14 +128,19 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
       <div v-else-if="error" :class="$style.error">{{ error }}</div>
       <div v-else-if="endpoints.length === 0" :class="$style.empty">No endpoints found</div>
       <template v-else>
-        <div v-for="(endpoints, tag) in filteredGroups" :key="tag" :class="$style.tagGroup">
+        <div v-for="(group, tag) in filteredGroups" :key="tag" :class="$style.tagGroup">
           <div :class="$style.tagHeader" @click="toggleTag(tag)">
-            <h2 :class="$style.tagTitle">{{ tag }}</h2>
+            <div :class="$style.tagTitleWrapper">
+              <h2 :class="$style.tagTitle">{{ tag }}</h2>
+              <span v-if="group.description" :class="$style.tagDescription">
+                - {{ group.description }}
+              </span>
+            </div>
             <span :class="[$style.tagToggle, { [$style.expanded]: isTagExpanded(tag) }]">▼</span>
           </div>
           <div v-show="isTagExpanded(tag)" :class="$style.tagContent">
             <div
-              v-for="endpoint in endpoints"
+              v-for="endpoint in group.endpoints"
               :key="`${endpoint.method}-${endpoint.path}`"
               :class="$style.endpoint"
               :style="{ backgroundColor: getMethodBackgroundColor(endpoint.method) }"
@@ -143,16 +163,22 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
                 <div v-if="endpoint.parameters?.length" :class="$style.section">
                   <h3 :class="$style.sectionTitle">Parameters</h3>
                   <div :class="$style.parameters">
+                    <div :class="$style.parameterHeaders">
+                      <h5 :class="$style.sectionName">Name</h5>
+                      <h5 :class="$style.sectionType">Type</h5>
+                      <h5 :class="$style.sectionDetail">Description</h5>
+                    </div>
                     <div v-for="param in endpoint.parameters" :key="param.name" :class="$style.parameter">
                       <div :class="$style.parameterName">
                         {{ param.name }}
                         <span v-if="param.required" :class="$style.required">*</span>
                       </div>
+                      <div :class="$style.parameterType">
+                        {{ param.schema?.type || param.type }}
+                        <span v-if="param.schema?.format">({{ param.schema.format }})</span>
+                        <span :class="$style.parameterLocation">({{ param.in }})</span>
+                      </div>
                       <div :class="$style.parameterDetails">
-                        <div :class="$style.parameterType">
-                          {{ param.in }} - {{ param.schema?.type || param.type }}
-                          <span v-if="param.schema?.format">({{ param.schema.format }})</span>
-                        </div>
                         <div :class="$style.parameterDescription">{{ param.description }}</div>
                         <div v-if="param.schema?.default" :class="$style.parameterDefault">
                           Default: {{ param.schema.default }}
@@ -205,6 +231,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 </template>
 
 <style module lang="scss">
+@use 'sass:color';
 @use '../../../assets/styles/index.scss' as *;
 
 .main {
@@ -263,12 +290,25 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   }
 }
 
+.tagTitleWrapper {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-sm;
+}
+
 .tagTitle {
   font-size: $font-size-lg;
   color: $text-color;
   margin: 0;
   font-weight: 600;
-  flex: 1;
+}
+
+.tagDescription {
+  font-size: $font-size-sm;
+  color: rgba($text-color, 0.6);
+  font-weight: normal;
+  font-style: italic;
 }
 
 .tagToggle {
@@ -289,7 +329,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   position: relative;
   border-radius: $border-radius-lg;
   margin-bottom: $spacing-md;
-  background-color: white;
+  background-color: rgba($text-color, 0.05);
   box-shadow: $shadow-sm;
   overflow: hidden;
 
@@ -372,18 +412,19 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 
 .endpointContent {
   border-top: 1px solid $border-color;
-  background-color: white;
+  background-color: rgba($primary-color, 0.02);
   padding: $spacing-xl;
 }
 
 .section {
-  padding-bottom: $spacing-xl;
-  border-bottom: 1px solid $border-color;
-  text-align: left;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-lg;
+  background-color: color.adjust($background-color, $lightness: 5%);
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
 
   &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+    margin-bottom: 0;
   }
 }
 
@@ -393,108 +434,106 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   margin-bottom: $spacing-lg;
   font-weight: 600;
   text-align: left;
+  border-bottom: 1px solid $border-color;
+  padding-bottom: $spacing-sm;
+}
+
+.sectionName {
+  font-weight: 600;
+  color: $text-color;
+  margin: 0;
+  font-size: $font-size-sm;
+}
+
+.sectionType {
+  font-weight: 600;
+  color: $text-color;
+  margin: 0;
+  font-size: $font-size-sm;
+}
+
+.sectionDetail {
+  font-weight: 500;
+  margin: 0;
+  font-size: $font-size-sm;
 }
 
 .parameters {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
-  text-align: left;
+}
+
+.parameterHeaders {
+  display: grid;
+  grid-template-columns: 200px 180px 1fr;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 1px solid $border-color;
 }
 
 .parameter {
-  display: flex;
-  gap: $spacing-lg;
+  display: grid;
+  grid-template-columns: 200px 180px 1fr;
+  gap: $spacing-md;
   padding: $spacing-md;
-  background-color: rgba($text-color, 0.05);
-  border-radius: $border-radius-md;
+  border-radius: $border-radius-sm;
+  background-color: rgba($text-color, 0.02);
+
+  &:hover {
+    background-color: rgba($text-color, 0.05);
+  }
 }
 
 .parameterName {
-  flex: 0 0 200px;
   font-family: monospace;
+  font-weight: 500;
   color: $text-color;
-  font-weight: 600;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
 }
 
 .required {
   color: $accent-color;
-  margin-left: 4px;
-}
-
-.parameterDetails {
-  flex: 1;
-  text-align: left;
+  font-weight: bold;
 }
 
 .parameterType {
+  font-family: monospace;
   font-size: $font-size-sm;
   color: $secondary-color;
-  margin-bottom: $spacing-xs;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.parameterLocation {
+  color: rgba($text-color, 0.7);
+}
+
+.parameterDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
 }
 
 .parameterDescription {
-  color: rgba($text-color, 0.7);
+  color: rgba($text-color, 0.8);
   font-size: $font-size-sm;
-  text-align: left;
 }
 
 .parameterDefault {
-  color: rgba($text-color, 0.6);
-  font-size: $font-size-sm;
-  font-style: italic;
-  margin-top: $spacing-xs;
-}
-
-.responses {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-lg;
-  text-align: left;
-}
-
-.response {
-  background-color: rgba($text-color, 0.05);
-  border-radius: $border-radius-md;
-  overflow: hidden;
-  text-align: left;
-}
-
-.responseHeader {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  padding: $spacing-md;
-  background-color: rgba($text-color, 0.1);
-  text-align: left;
-}
-
-.responseStatus {
   font-family: monospace;
-  font-weight: 600;
-  color: $secondary-color;
-  text-align: left;
-}
-
-.responseDescription {
-  color: rgba($text-color, 0.9);
   font-size: $font-size-sm;
-  text-align: left;
-}
-
-.responseContent {
-  padding: $spacing-md;
-  text-align: left;
+  color: rgba($text-color, 0.6);
 }
 
 .contentType {
   font-family: monospace;
   font-size: $font-size-sm;
-  color: rgba($text-color, 0.7);
+  color: $secondary-color;
   margin-bottom: $spacing-sm;
-  text-align: left;
 }
 
 .example {
@@ -502,46 +541,66 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   padding: $spacing-md;
   border-radius: $border-radius-md;
   font-family: monospace;
-  color: $text-color;
   font-size: $font-size-sm;
-  margin: 0;
+  color: $text-color;
   overflow-x: auto;
-  text-align: left;
-
-  code {
-    white-space: pre;
-    color: inherit;
-    text-align: left;
-    display: block;
-    padding: 0;
-  }
+  white-space: pre-wrap;
 }
 
-.success {
-  background-color: rgba($secondary-color, 0.1) !important;
-  .responseStatus {
-    color: $secondary-color !important;
-  }
+.responses {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
 }
 
-.clientError {
-  background-color: rgba(#f44336, 0.1) !important;
-  .responseStatus {
-    color: #f44336 !important;
-  }
+.response {
+  border-radius: $border-radius-md;
+  overflow: hidden;
+  background-color: rgba($text-color, 0.02);
 }
 
-.serverError {
-  background-color: rgba(#ff9800, 0.1) !important;
-  .responseStatus {
-    color: #ff9800 !important;
-  }
+.responseHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: rgba($text-color, 0.05);
 }
 
-.redirect {
-  background-color: rgba(#9c27b0, 0.1) !important;
-  .responseStatus {
-    color: #9c27b0 !important;
-  }
+.responseStatus {
+  font-family: monospace;
+  font-weight: 500;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  background-color: rgba($text-color, 0.1);
+}
+
+.responseDescription {
+  color: rgba($text-color, 0.8);
+  font-size: $font-size-sm;
+}
+
+.responseContent {
+  padding: $spacing-md;
+}
+
+.success .responseStatus {
+  background-color: rgba($secondary-color, 0.2);
+  color: $secondary-color;
+}
+
+.redirect .responseStatus {
+  background-color: rgba($warning-color, 0.2);
+  color: $warning-color;
+}
+
+.clientError .responseStatus {
+  background-color: rgba($accent-color, 0.2);
+  color: $accent-color;
+}
+
+.serverError .responseStatus {
+  background-color: rgba($error-color, 0.2);
+  color: $error-color;
 }
 </style>
