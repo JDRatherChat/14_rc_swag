@@ -1,0 +1,9 @@
+'200':
+  description: successful operation
+  content:
+    application/json:
+      example:
+        id: 10
+        username: "new_user"
+        email: "new.user@example.com"
+        status: "pending_verification"

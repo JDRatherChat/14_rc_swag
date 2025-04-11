@@ -1,148 +1,149 @@
 # Style Guide
 
-## CSS Architecture
+## Colors
 
-### Directory Structure
-```
-src/
-├── assets/
-│   └── styles/
-│       ├── _variables.scss    # Global variables
-│       ├── _mixins.scss       # Reusable mixins
-│       ├── _reset.scss        # CSS reset/normalize
-│       └── index.scss         # Main stylesheet
-└── components/
-    └── layout/
-        ├── AppHeader/
-        ├── AppInfo/
-        ├── AppMain/
-        └── AppServers/
-            └── *.module.scss   # Component-specific styles
-```
-
-### Naming Conventions
-- Use kebab-case for class names
-- Use PascalCase for component names
-- Use camelCase for SCSS variables and mixins
-- Prefix layout components with 'App'
-
-### CSS Modules
-- Each component has its own scoped stylesheet
-- Use composition for shared styles
-- Avoid global styles except for base elements
-- Import global variables and mixins in each module
-
-### Variables
+### Theme Colors
 ```scss
-// Colors
-$primary-color: #2c3e50;
-$secondary-color: #42b983;
-$text-color: #333333;
-$background-color: #ffffff;
-$border-color: rgba(0, 0, 0, 0.1);
+$background-color: #1a1a1a;      // Dark background
+$text-color: #ffffff;            // White text
+$border-color: #333333;          // Dark borders
+$secondary-color: #4CAF50;       // Green accent
+```
 
-// Method Colors
-$method-get: #2196F3;    // Light blue
-$method-post: #4CAF50;   // Green
-$method-put: #FF9800;    // Orange
-$method-delete: #F44336; // Red
-$method-patch: #9C27B0;  // Purple
+### HTTP Methods
+```scss
+GET: #2196F3     // Light blue
+POST: #4CAF50    // Green
+PUT: #FF9800     // Orange
+DELETE: #F44336  // Red
+PATCH: #9C27B0   // Purple
+```
 
-// Typography
-$font-family-base: 'Inter', sans-serif;
-$font-family-mono: 'Fira Code', monospace;
-$font-size-base: 16px;
+### Response Status
+```scss
+2xx: #4CAF50    // Green for success
+4xx: #F44336    // Red for client errors
+5xx: #FF9800    // Orange for server errors
+```
+
+## Typography
+
+### Font Families
+```scss
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+```
+
+### Font Sizes
+```scss
+$font-size-xs: 12px;
 $font-size-sm: 14px;
 $font-size-md: 16px;
 $font-size-lg: 18px;
 $font-size-xl: 24px;
-$line-height-base: 1.5;
+```
 
-// Spacing
+## Spacing
+
+### Base Units
+```scss
 $spacing-xs: 4px;
 $spacing-sm: 8px;
 $spacing-md: 16px;
 $spacing-lg: 24px;
 $spacing-xl: 32px;
+```
 
-// Layout
+### Layout
+```scss
 $header-height: 64px;
-$container-width: 75vw;
+$sidebar-width: 250px;
+$container-width: 80vw;
+```
+
+## Borders & Shadows
+
+### Borders
+```scss
 $border-radius-sm: 4px;
-$border-radius-md: 6px;
-
-// Transitions
-$transition-fast: 0.2s ease;
-$transition-medium: 0.3s ease;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
 ```
 
-### Component-Specific Styles
-
-#### AppHeader
+### Shadows
 ```scss
-.header {
-  position: fixed;
-  height: $header-height;
-  width: 100%;
-}
-
-.container {
-  width: $container-width;
-  padding-left: calc($spacing-xl + 32px + #{$spacing-sm});
-}
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
 ```
 
-#### AppMain
+## Transitions
+
+### Duration
 ```scss
-.container {
-  width: $container-width;
-  padding-left: calc($spacing-xl + 10px + #{$spacing-sm});
-}
+$transition-fast: 0.15s ease;
+$transition-normal: 0.25s ease;
+$transition-slow: 0.35s ease;
+```
 
-.tagGroup {
-  width: 100%;
-  border-bottom: 1px solid $border-color;
-}
+## Components
 
-.endpointHeader {
-  cursor: pointer;
-  transition: background-color $transition-fast;
+### Buttons
+```scss
+.button {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  transition: all $transition-fast;
 }
 ```
 
-### Layout Guidelines
-- Use fixed header with consistent height
-- Maintain 75vw width for main content
-- Left-align text and content
-- Use consistent padding across components
-- Implement smooth transitions for interactive elements
+### Inputs
+```scss
+.input {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  background-color: rgba($text-color, 0.1);
+  border: 1px solid $border-color;
+}
+```
 
-### Interactive Elements
-- Hover effects for buttons and clickable items
-- Smooth transitions for expansions and state changes
-- Clear visual feedback for interactive elements
-- Consistent button styling across components
+### Cards
+```scss
+.card {
+  background-color: rgba($text-color, 0.05);
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  padding: $spacing-md;
+}
+```
 
-### HTTP Method Colors
-- GET: Light blue (#2196F3)
-- POST: Green (#4CAF50)
-- PUT: Orange (#FF9800)
-- DELETE: Red (#F44336)
-- PATCH: Purple (#9C27B0)
+## Best Practices
 
-### Best Practices
-1. Use CSS Modules for component isolation
-2. Maintain consistent spacing using variables
-3. Implement smooth transitions for better UX
-4. Follow color scheme for HTTP methods
-5. Use proper typography hierarchy
-6. Ensure responsive behavior
-7. Keep styles modular and reusable
+1. **SCSS Modules**
+   - Use SCSS modules for component-scoped styles
+   - Import global variables and mixins as needed
+   - Keep component styles focused and minimal
 
-### Recent Updates
-1. Added consistent container width (75vw)
-2. Updated padding calculations
-3. Enhanced button hover states
-4. Improved tag group styling
-5. Added transition effects
-6. Standardized HTTP method colors
+2. **Responsive Design**
+   - Use relative units (rem, em) for typography
+   - Use viewport units for layout (vw, vh)
+   - Implement mobile-first media queries
+
+3. **Dark Theme**
+   - Use proper contrast ratios for accessibility
+   - Implement subtle gradients for depth
+   - Use opacity for interactive states
+
+4. **Code Organization**
+   - Group related styles together
+   - Use consistent naming conventions
+   - Comment complex calculations or effects
+
+5. **Performance**
+   - Minimize nested selectors
+   - Use efficient selectors
+   - Avoid expensive properties
+   - Optimize transitions and animations

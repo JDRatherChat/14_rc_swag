@@ -7,20 +7,48 @@ export function useOpenApi() {
   const error = ref(null)
   const endpoints = ref([])
 
-  const loadApiSpec = async () => {
+  async function loadOpenApiSpec() {
     try {
       loading.value = true
       error.value = null
 
-      const response = await fetch('/test.yaml')
-      const yamlText = await response.text()
-      apiSpec.value = yaml.load(yamlText)
+      // Load and parse the main OpenAPI file
+      const mainResponse = await fetch('/test.yaml')
+      const mainYaml = await mainResponse.text()
+      const mainSpec = yaml.load(mainYaml)
+
+      // Function to resolve $ref in an object
+      async function resolveRefs(obj) {
+        if (!obj) return obj
+
+        if (typeof obj === 'object') {
+          // Handle $ref
+          if (obj.$ref) {
+            const refPath = obj.$ref
+            if (refPath.startsWith('./')) {
+              const response = await fetch(`/openapi/${refPath.slice(2)}`)
+              const yaml = await response.text()
+              return yaml.load(yaml)
+            }
+            return obj
+          }
+
+          // Recursively resolve refs in object properties
+          for (const key in obj) {
+            obj[key] = await resolveRefs(obj[key])
+          }
+        }
+        return obj
+      }
+
+      // Resolve all refs in the main spec
+      apiSpec.value = await resolveRefs(mainSpec)
 
       // Process endpoints after loading
       processEndpoints()
     } catch (e) {
-      error.value = e.message
-      console.error('Failed to load API spec:', e)
+      console.error('Error loading OpenAPI spec:', e)
+      error.value = 'Failed to load API documentation'
     } finally {
       loading.value = false
     }
@@ -29,7 +57,7 @@ export function useOpenApi() {
   // Extract info for AppInfo component
   const getApiInfo = () => {
     if (!apiSpec.value) return null;
-    
+
     const { info, servers, tags } = apiSpec.value;
     return {
       title: info?.title,
@@ -86,7 +114,7 @@ export function useOpenApi() {
         if (method === 'parameters') continue
 
         const tags = details.tags || ['Other']
-        
+
         processed.push({
           path,
           method: method.toUpperCase(),
@@ -144,7 +172,7 @@ export function useOpenApi() {
   }
 
   onMounted(() => {
-    loadApiSpec()
+    loadOpenApiSpec()
   })
 
   return {

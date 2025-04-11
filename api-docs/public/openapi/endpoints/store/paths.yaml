@@ -1,0 +1,45 @@
+paths:
+  /store/inventory:
+    get:
+      tags:
+        - store
+      summary: Returns pet inventories by status
+      description: Returns a map of status codes to quantities
+      operationId: getInventory
+      responses:
+        '200':
+          $ref: '../examples/store/inventory.yaml#/200'
+
+  /store/order:
+    post:
+      tags:
+        - store
+      summary: Place an order for a pet
+      description: Place a new order in the store
+      operationId: placeOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                petId:
+                  type: integer
+                  format: int64
+                quantity:
+                  type: integer
+                  format: int32
+                shipDate:
+                  type: string
+                  format: date-time
+                status:
+                  type: string
+                  description: Order Status
+                  enum: [placed, approved, delivered]
+                complete:
+                  type: boolean
+      responses:
+        '200':
+          $ref: '../examples/store/order.yaml#/200'
+        '400':
+          description: Invalid order

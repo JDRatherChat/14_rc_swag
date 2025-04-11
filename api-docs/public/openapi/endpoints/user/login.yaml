@@ -1,0 +1,10 @@
+'200':
+  description: successful operation
+  content:
+    application/json:
+      example:
+        id: 4
+        username: "john_doe"
+        email: "john@example.com"
+        status: "active"
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."

@@ -1,0 +1,53 @@
+paths:
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      description: Logs in with username and password
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '../examples/user/login.yaml#/200'
+        '400':
+          description: Invalid username/password supplied
+
+  /user/signup:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: Create a new user account
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          $ref: '../examples/user/signup.yaml#/200'
+        '400':
+          description: Invalid user data supplied

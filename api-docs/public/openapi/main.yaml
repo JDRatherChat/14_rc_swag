@@ -1,0 +1,17 @@
+openapi: 3.1.0
+
+info:
+  title: RatherChat API
+  description: RatherChat API documentation for developers
+  version: 1.0.7
+  termsOfService: "https://rather.chat/terms-conditions/"
+  privacyPolicy: "https://rather.chat/privacy-policy/"
+  contact:
+    email: dev@rather.chat
+
+servers:
+  - url: https://bot-service.rather.chat/api/docs/
+    description: Base URL
+
+tags:
+  $ref: "openapi/tags.yaml"

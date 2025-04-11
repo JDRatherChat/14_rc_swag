@@ -134,3 +134,117 @@ api-docs/
 3. Updated button styles and hover effects
 4. Improved layout consistency and spacing
 5. Enhanced visual hierarchy with proper padding
+
+## Project Context
+
+### Overview
+
+This API documentation viewer is designed to provide a modern, user-friendly interface for viewing and interacting with OpenAPI specifications. The project uses Vue 3 for the frontend and implements a modular approach to OpenAPI specification organization.
+
+### Key Features
+
+#### 1. Modular OpenAPI Structure
+- Organized by domains (Pet, Store, User, etc.)
+- Separate files for endpoints and examples
+- Easy to maintain and scale
+- Reusable components across projects
+
+#### 2. Search Functionality
+- Real-time filtering of endpoints
+- Searches across:
+  - Endpoint paths
+  - Parameters
+  - Tags
+  - Descriptions
+  - HTTP methods
+
+#### 3. Visual Enhancements
+- Color-coded HTTP methods:
+  - GET: Blue
+  - POST: Green
+  - PUT: Orange
+  - DELETE: Red
+  - PATCH: Purple
+
+- Color-coded response statuses:
+  - 2xx: Green (Success)
+  - 4xx: Red (Client Error)
+  - 5xx: Orange (Server Error)
+
+#### 4. Interactive UI
+- Expandable endpoint sections
+- Tag-based organization
+- Clear parameter display
+- JSON request/response examples
+- Modern dark theme
+
+### File Organization
+
+#### OpenAPI Specification
+```
+public/openapi/
+├── info/
+│   └── info.yaml           # API information
+├── endpoints/
+│   ├── tags/
+│   │   └── tags.yaml      # Tag definitions
+│   ├── paths/
+│   │   └── [domain].yaml  # Endpoint definitions
+│   └── examples/
+│       └── [domain]/      # Response examples
+└── main.yaml              # Main entry point
+```
+
+#### Frontend Components
+```
+src/
+├── components/
+│   └── layout/
+│       ├── AppHeader/     # Search and navigation
+│       ├── AppMain/       # Main content display
+│       └── AppInfo/       # API information
+├── composables/
+│   └── useOpenApi.js      # OpenAPI data handling
+└── assets/
+    └── styles/           # SCSS modules
+```
+
+### Design Decisions
+
+1. **Modular OpenAPI Structure**
+   - Separate files for better maintainability
+   - Domain-driven organization
+   - Easy to extend and modify
+
+2. **Vue 3 + Composition API**
+   - Modern reactive framework
+   - Better code organization
+   - Improved performance
+
+3. **SCSS Modules**
+   - Scoped styling
+   - Maintainable CSS
+   - Consistent theming
+
+4. **Dark Theme**
+   - Reduced eye strain
+   - Modern appearance
+   - Professional look
+
+### Future Considerations
+
+1. **Potential Enhancements**
+   - Authentication support
+   - Try-it-now functionality
+   - Multiple theme support
+   - Export to PDF/HTML
+
+2. **Scalability**
+   - Support for multiple API versions
+   - Custom example sets per environment
+   - Shared response schemas
+
+3. **Integration**
+   - CI/CD pipeline for documentation
+   - Automated example generation
+   - Live API testing

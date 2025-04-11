@@ -1,0 +1,54 @@
+'200':
+  description: "successful operation"
+  content:
+    application/json:
+      schema:
+        $ref: "#/definitions/Pet"
+      example:
+        id: 10
+        name: "doggie"
+        category:
+          id: 1
+          name: "Dogs"
+        photoUrls:
+          - "https://example.com/dog1.jpg"
+        tags:
+          - id: 1
+            name: "friendly"
+        status: "available"
+
+'400':
+  description: "Invalid ID supplied"
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          code:
+            type: integer
+          type:
+            type: string
+          message:
+            type: string
+      example:
+        code: 400
+        type: "error"
+        message: "Invalid pet ID supplied"
+
+'404':
+  description: "Pet not found"
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          code:
+            type: integer
+          type:
+            type: string
+          message:
+            type: string
+      example:
+        code: 404
+        type: "error"
+        message: "Pet not found"

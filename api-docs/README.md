@@ -1,112 +1,78 @@
-# RatherChat API Documentation Frontend
+# RatherChat API Documentation
 
-A Vue 3 desktop application for displaying and managing RatherChat's API documentation. Built with modern web technologies and best practices for maintainability and extensibility.
+A modern, interactive API documentation viewer built with Vue 3 and Vite. This project provides a clean and intuitive interface for viewing OpenAPI specifications.
 
-## 🚀 Features
+## Features
 
-- Modern, professional dark theme interface
-- Interactive API endpoint documentation
-- OpenAPI 3.1.0 specification support
-- Real-time endpoint search filtering
-- Color-coded HTTP methods
-- Expandable endpoint details
-- JSON response examples
-- Terms of Service documentation
+- 🎨 Modern and clean UI with dark theme
+- 🔍 Real-time search across endpoints, parameters, and tags
+- 🎯 Color-coded HTTP methods and response statuses
+- 📚 Organized endpoints by tags with descriptions
+- 🔗 Interactive endpoint expansion
+- 📝 JSON request/response examples
+- 🚀 Fast and responsive interface
 
-## 🛠️ Tech Stack
+## Project Structure
 
-- Vue 3 with Composition API
-- Vite for blazing fast development
-- SCSS modules for component-scoped styling
-- Modern JavaScript (ES6+)
-
-## 📦 Installation
-
-```bash
-# Clone the repository
-git clone [your-repo-url]
-
-# Navigate to project directory
-cd api-docs
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-## 📚 Documentation
-
-Find detailed documentation in the `docs` folder:
-- `context.md` - Project context and progress
-- `endpoints.yaml` - OpenAPI specification
-- `tos.md` - Terms of Service
-
-## 🏗️ Project Structure
+The project follows a modular OpenAPI specification structure:
 
 ```
 api-docs/
 ├── public/
-│   ├── endpoints.yaml    # OpenAPI specification
-│   ├── tos.md           # Terms of Service
-│   ├── rc_white_logo.png
-│   └── fb_1.jpg
-├── src/
-│   ├── components/
-│   │   └── layout/
-│   │       ├── AppHeader/  # Logo, search, and schema download
-│   │       ├── AppInfo/    # Project info and metadata
-│   │       └── AppMain/    # API endpoints display
-│   ├── assets/
-│   │   └── styles/        # SCSS variables and mixins
-│   └── App.vue
-└── docs/
-    └── context.md         # Project documentation
+│   ├── openapi/
+│   │   ├── info/
+│   │   │   └── info.yaml           # API information and servers
+│   │   └── endpoints/
+│   │       ├── tags/
+│   │       │   └── tags.yaml       # API tags definitions
+│   │       ├── paths/
+│   │       │   ├── pet.yaml        # Pet endpoints
+│   │       │   ├── store.yaml      # Store endpoints
+│   │       │   └── user.yaml       # User endpoints
+│   │       └── examples/
+│   │           ├── pet/            # Pet endpoint examples
+│   │           ├── store/          # Store endpoint examples
+│   │           └── user/           # User endpoint examples
+│   └── test.yaml                   # Legacy single-file OpenAPI spec
+└── src/
+    ├── components/                 # Vue components
+    ├── composables/               # Vue composables
+    └── assets/                   # Styles and assets
 ```
 
-## 🧩 Components
+## Getting Started
 
-### AppHeader
-- Project logo display
-- Real-time search functionality
-- Schema download button
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### AppInfo
-- Project name and version display
-- OpenAPI version information
-- Project description
-- Terms of Service link
-- Developer contact button
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-### AppMain
-- API endpoint listing
-- Color-coded HTTP methods
-- Expandable endpoint details
-- JSON response examples
-- Search result filtering
+3. Build for production:
+   ```bash
+   npm run build
+   ```
 
-## 🎨 Styling
+## Adding New API Documentation
 
-We use SCSS modules with a professional dark theme:
-- 80vw content width for optimal readability
-- Left-aligned content for consistency
-- Color-coded HTTP methods for quick identification
-- Smooth transitions for expandable sections
-- Monospace fonts for code examples
-- Consistent spacing system
+1. Choose the appropriate domain folder in `public/openapi/endpoints/paths/`
+2. Create your endpoint definition file (e.g., `new-domain.yaml`)
+3. Add examples in `public/openapi/endpoints/examples/new-domain/`
+4. Add the tag in `public/openapi/endpoints/tags/tags.yaml`
+5. Reference your new files in `public/openapi/main.yaml`
 
-## 🔜 Upcoming Features
+## Development
 
-1. Complete OpenAPI specification integration
-2. Enhanced search capabilities
-3. Response schema documentation
-4. Proper error handling
-5. Additional interactive features
+- The project uses Vue 3 with Composition API
+- Styling is done with SCSS modules
+- OpenAPI 3.1.0 specification is used for API documentation
+- File references use $ref for modular organization
 
-## 📝 License
-
-[Your License] 2025 RatherChat
+For more details, see the docs folder:
+- [Project Structure](docs/PROJECT_STRUCTURE.md)
+- [Style Guide](docs/STYLE_GUIDE.md)
+- [Context](docs/context.md)

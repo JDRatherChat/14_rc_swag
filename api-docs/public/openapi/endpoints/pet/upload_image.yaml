@@ -1,0 +1,64 @@
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          additionalMetadata:
+            type: string
+            description: "Additional data to pass to server"
+          file:
+            type: string
+            format: binary
+            description: "File to upload"
+      example:
+        additionalMetadata: "Additional data about my dog"
+        file: "(binary)"
+
+'200':
+  description: "Successful operation"
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          code:
+            type: integer
+          type:
+            type: string
+          message:
+            type: string
+          data:
+            type: object
+            properties:
+              id:
+                type: integer
+              photoUrls:
+                type: array
+                items:
+                  type: string
+      example:
+        code: 200
+        type: "success"
+        message: "File uploaded successfully"
+        data:
+          id: 10
+          photoUrls: ["https://example.com/dog1.jpg"]
+
+'405':
+  description: "Invalid input"
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          code:
+            type: integer
+          type:
+            type: string
+          message:
+            type: string
+      example:
+        code: 405
+        type: "error"
+        message: "Invalid input provided"
