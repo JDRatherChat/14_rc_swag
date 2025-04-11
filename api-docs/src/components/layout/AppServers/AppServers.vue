@@ -18,13 +18,16 @@ const servers = computed(() => getApiInfo()?.servers || [])
 </template>
 
 <style lang="scss" module>
-@import '../../../assets/styles/_variables.scss';
+@use 'sass:color';
+@use '../../../assets/styles/index.scss' as *;
 
 .container {
-  padding: $spacing-lg;
+  padding: $spacing-lg ($spacing-lg + 50px);
   background-color: rgba($background-color, 0.5);
   border-top: 1px solid $border-color;
   border-bottom: 1px solid $border-color;
+  width: 80vw; /* Limit width for better readability */
+  min-width: 600px;
 }
 
 .serverList {

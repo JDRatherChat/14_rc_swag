@@ -28,17 +28,18 @@ export function useOpenApi() {
 
   // Extract info for AppInfo component
   const getApiInfo = () => {
-    if (!apiSpec.value) return null
+    if (!apiSpec.value) return null;
     
+    const { info, servers, tags } = apiSpec.value;
     return {
-      title: apiSpec.value.info.title,
-      version: apiSpec.value.info.version,
-      description: apiSpec.value.info.description,
-      openApiVersion: apiSpec.value.openapi,
-      termsOfService: apiSpec.value.info.termsOfService,
-      privacyPolicy: apiSpec.value.info.privacyPolicy,
-      contact: apiSpec.value.info.contact,
-      servers: apiSpec.value.servers || []
+      title: info?.title,
+      description: info?.description,
+      version: info?.version,
+      termsOfService: info?.termsOfService,
+      privacyPolicy: info?.privacyPolicy,
+      contact: info?.contact,
+      servers: servers || [],
+      tags: tags || []
     }
   }
 
@@ -102,7 +103,38 @@ export function useOpenApi() {
   }
 
   // Get endpoints (now returns the ref)
-  const getEndpoints = () => endpoints.value
+  const getEndpoints = () => {
+    if (!apiSpec.value?.paths) return [];
+
+    const endpoints = [];
+    const paths = apiSpec.value.paths;
+
+    Object.entries(paths).forEach(([path, methods]) => {
+      Object.entries(methods).forEach(([method, details]) => {
+        if (method === 'parameters') return; // Skip common parameters
+
+        endpoints.push({
+          path,
+          method: method.toUpperCase(),
+          tags: details.tags || [],
+          summary: details.summary,
+          description: details.description,
+          parameters: [
+            ...(paths[path].parameters || []), // Common parameters
+            ...(details.parameters || [])
+          ],
+          requestBody: details.requestBody,
+          responses: Object.entries(details.responses).map(([status, response]) => ({
+            status,
+            ...response
+          })),
+          expanded: false
+        });
+      });
+    });
+
+    return endpoints;
+  }
 
   // Toggle endpoint expansion
   const toggleEndpoint = (endpoint) => {

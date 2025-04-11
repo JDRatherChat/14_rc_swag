@@ -2,16 +2,15 @@ openapi: 3.1.0
 info:
   title: RatherChat API
   description: RatherChat API documentation for developers
-  version: 1.0.7
-  termsOfService: /tos.md
+  version: 1.0.0
+  termsOfService: "https://rather.chat/terms-conditions/"
+  privacyPolicy: "https://rather.chat/privacy-policy/"
   contact:
     email: dev@rather.chat
 
 servers:
-  - url: https://api.rather.chat/v1
-    description: Production server
-  - url: https://staging-api.rather.chat/v1
-    description: Staging server
+  - url: https://bot-service.rather.chat/api/docs/
+    description: Base URL
 
 paths:
   /users:

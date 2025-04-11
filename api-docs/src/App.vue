@@ -32,7 +32,8 @@ function handleSearch(query) {
 </template>
 
 <style lang="scss" module>
-@import './assets/styles/index.scss';
+@use 'sass:color';
+@use './assets/styles/index.scss' as *;
 
 .app {
   min-height: 100vh;

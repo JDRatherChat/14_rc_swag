@@ -24,7 +24,7 @@ function handleSearch(event) {
         <img src="/rc_white_logo.png" alt="RatherChat Logo" :class="$style.logo" />
         <h1 :class="$style.title">RatherChat API Documentation</h1>
       </div>
-      <a :class="$style.downloadButton" href="/openapi.yaml" download>
+      <a :class="[$style.downloadButton, $style.primary]" href="/test.yaml" download>
         Download Schema
       </a>
       <div :class="$style.search">
@@ -41,7 +41,8 @@ function handleSearch(event) {
 </template>
 
 <style lang="scss" module>
-@import '../../../assets/styles/index.scss';
+@use 'sass:color';
+@use '../../../assets/styles/index.scss' as *;
 
 .header {
   grid-area: header;
@@ -101,8 +102,17 @@ function handleSearch(event) {
   transition: all $transition-fast;
 
   &:hover {
-    background-color: lighten($secondary-color, 10%);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: rgba($text-color, 0.05);
+  }
+
+  &.primary {
+    background-color: $secondary-color;
+    border-color: $primary-color;
+    color: white;
+
+    &:hover {
+      background-color: color.adjust($secondary-color, $lightness: -20%);
+    }
   }
 }
 

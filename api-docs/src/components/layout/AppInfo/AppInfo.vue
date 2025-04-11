@@ -57,14 +57,15 @@ const contactDeveloper = () => {
 </template>
 
 <style lang="scss" module>
-@import '../../../assets/styles/index.scss';
+@use 'sass:color';
+@use '../../../assets/styles/index.scss' as *;
 
 .info {
   grid-area: info;
   padding: $spacing-xl;
   padding-left: calc($spacing-xl + 32px + #{$spacing-sm}); /* Match AppMain padding */
   border-bottom: 1px solid $border-color;
-  background-color: lighten($background-color, 2%); /* Slightly lighter than background */
+  background-color: color.adjust($background-color, $lightness: 2%); /* Slightly lighter than background */
   margin-top: calc($spacing-xl / 2); /* Reduced margin by half */
 }
 
@@ -122,7 +123,8 @@ const contactDeveloper = () => {
   margin: 0;
   line-height: 1.5;
   text-align: left;
-  max-width: 800px; /* Limit width for better readability */
+  width: 80vw; /* Limit width for better readability */
+  min-width: 600px;
 }
 
 .actions {
@@ -146,12 +148,12 @@ const contactDeveloper = () => {
   }
 
   &.primary {
-    background-color: $primary-color;
+    background-color: $secondary-color;
     border-color: $primary-color;
     color: white;
 
     &:hover {
-      background-color: darken($primary-color, 5%);
+      background-color: color.adjust($secondary-color, $lightness: -20%);
     }
   }
 }

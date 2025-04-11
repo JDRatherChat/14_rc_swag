@@ -12,7 +12,19 @@ servers:
   - url: https://bot-service.rather.chat/api/docs/
     description: Base URL
 
+tags:
+  - name: Pets
+    description: Everything about your Pets
+    externalDocs:
+      description: Find out more
+      url: http://rather.chat/api/pets
+  - name: Store
+    description: Access to Pet store orders
+  - name: Users
+    description: Operations about users
+
 paths:
+  # Pet endpoints
   /pet/{petId}/uploadImage:
     post:
       tags:
@@ -276,6 +288,8 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+
+  # Store endpoints
   /store/inventory:
     get:
       tags:
@@ -374,6 +388,8 @@ paths:
           description: "Invalid ID supplied"
         404:
           description: "Order not found"
+
+  # User endpoints
   /user/createWithList:
     post:
       tags:
@@ -568,6 +584,7 @@ paths:
       responses:
         default:
           description: "successful operation"
+
 securityDefinitions:
   api_key:
     type: "apiKey"
@@ -580,6 +597,7 @@ securityDefinitions:
     scopes:
       read:pets: "read your pets"
       write:pets: "modify pets in your account"
+
 definitions:
   ApiResponse:
     type: "object"
@@ -700,6 +718,7 @@ definitions:
         description: "User Status"
     xml:
       name: "User"
+
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"

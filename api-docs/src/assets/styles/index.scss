@@ -1,3 +1,6 @@
-@import './_variables';
-@import './_mixins';
-@import './_reset';
+@use 'sass:color';
+@forward './_variables';
+@forward './_mixins';
+@use './_variables' as *;
+@use './_mixins' as *;
+@use './_reset' as *;
