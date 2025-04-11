@@ -6,8 +6,12 @@ const { loading, error, getApiInfo } = useOpenApi()
 
 const apiInfo = computed(() => getApiInfo())
 
-const openTos = () => {
-  window.open('/tos.md', '_blank')
+const openTermsOfService = () => {
+  window.open('https://rather.chat/terms-conditions/', '_blank')
+}
+
+const openPrivacyPolicy = () => {
+  window.open('https://rather.chat/privacy-policy/', '_blank')
 }
 
 const contactDeveloper = () => {
@@ -38,15 +42,10 @@ const contactDeveloper = () => {
       </p>
 
       <div :class="$style.actions">
-        <button 
-          v-if="apiInfo.termsOfService" 
-          :class="$style.button"
-          @click="openTos"
-        >
-          Terms of Service
-        </button>
-        <button 
-          v-if="apiInfo.contact" 
+        <button :class="$style.button" @click="openTermsOfService">Terms of Service</button>
+        <button :class="$style.button" @click="openPrivacyPolicy">Privacy Policy</button>
+        <button
+          v-if="apiInfo.contact"
           :class="[$style.button, $style.primary]"
           @click="contactDeveloper"
         >
