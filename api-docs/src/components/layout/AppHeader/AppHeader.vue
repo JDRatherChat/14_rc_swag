@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 
-defineProps({
+const props = defineProps({
   onSearch: {
     type: Function,
     required: true
@@ -13,7 +13,12 @@ const searchQuery = ref('')
 function handleSearch(event) {
   const query = event.target.value
   searchQuery.value = query
-  onSearch(query)
+  props.onSearch(query)
+}
+
+function handleSubmit(event) {
+  event.preventDefault()
+  props.onSearch(searchQuery.value)
 }
 </script>
 
@@ -27,15 +32,15 @@ function handleSearch(event) {
       <a :class="[$style.downloadButton, $style.primary]" href="/test.yaml" download>
         Download Schema
       </a>
-      <div :class="$style.search">
+      <form :class="$style.search" @submit="handleSubmit">
         <input
           type="text"
           :class="$style.searchInput"
-          placeholder="Search endpoints..."
-          :value="searchQuery"
+          placeholder="Search endpoints, parameters, tags..."
+          v-model="searchQuery"
           @input="handleSearch"
         />
-      </div>
+      </form>
     </div>
   </header>
 </template>
@@ -117,27 +122,29 @@ function handleSearch(event) {
 }
 
 .search {
-  width: 200px;
+  position: relative;
+  width: 300px;
+  margin-left: auto;
 }
 
 .searchInput {
   width: 100%;
   padding: $spacing-xs $spacing-md;
+  font-size: $font-size-sm;
+  color: $text-color;
+  background-color: rgba($text-color, 0.1);
   border: 1px solid $border-color;
   border-radius: $border-radius-sm;
-  background-color: rgba($text-color, 0.05);
-  color: $text-color;
-  font-size: $font-size-sm;
   outline: none;
-  transition: all $transition-fast;
-
-  &:focus {
-    border-color: $secondary-color;
-    background-color: rgba($text-color, 0.1);
-  }
+  transition: all 0.2s ease;
 
   &::placeholder {
     color: rgba($text-color, 0.5);
+  }
+
+  &:focus {
+    background-color: rgba($text-color, 0.15);
+    border-color: $secondary-color;
   }
 }
 </style>

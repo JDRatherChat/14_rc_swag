@@ -46,6 +46,51 @@ const groupEndpointsByTag = computed(() => {
   return groups;
 });
 
+const searchInParameters = (endpoint, query) => {
+  // Search in path parameters
+  const hasMatchingPathParam = endpoint.parameters?.some(param => 
+    param.name.toLowerCase().includes(query) ||
+    param.description?.toLowerCase().includes(query) ||
+    param.in?.toLowerCase().includes(query)
+  );
+  if (hasMatchingPathParam) return true;
+
+  // Search in request body parameters
+  if (endpoint.requestBody?.content) {
+    for (const contentType in endpoint.requestBody.content) {
+      const schema = endpoint.requestBody.content[contentType].schema;
+      if (schema?.properties) {
+        const hasMatchingBodyParam = Object.keys(schema.properties).some(propName =>
+          propName.toLowerCase().includes(query) ||
+          schema.properties[propName].description?.toLowerCase().includes(query)
+        );
+        if (hasMatchingBodyParam) return true;
+      }
+    }
+  }
+
+  // Search in response parameters
+  if (endpoint.responses) {
+    for (const status in endpoint.responses) {
+      const response = endpoint.responses[status];
+      if (response.content) {
+        for (const contentType in response.content) {
+          const schema = response.content[contentType].schema;
+          if (schema?.properties) {
+            const hasMatchingResponseParam = Object.keys(schema.properties).some(propName =>
+              propName.toLowerCase().includes(query) ||
+              schema.properties[propName].description?.toLowerCase().includes(query)
+            );
+            if (hasMatchingResponseParam) return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 const filteredGroups = computed(() => {
   const query = searchQuery.value.toLowerCase();
   const groups = {};
@@ -54,7 +99,9 @@ const filteredGroups = computed(() => {
     const filteredEndpoints = group.endpoints.filter(endpoint =>
       endpoint.path.toLowerCase().includes(query) ||
       endpoint.description?.toLowerCase().includes(query) ||
-      endpoint.method.toLowerCase().includes(query)
+      endpoint.method.toLowerCase().includes(query) ||
+      endpoint.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+      searchInParameters(endpoint, query)
     );
 
     if (filteredEndpoints.length > 0) {
@@ -104,18 +151,36 @@ const methodColors = {
   PATCH: '#9C27B0'   // Purple
 }
 
-const getMethodBackgroundColor = (method) => {
-  const color = methodColors[method]
-  return color ? `${color}20` : 'transparent' // 10 is hex for 6% opacity
+const statusColors = {
+  '200': '#4CAF50', // Green for success
+  '201': '#4CAF50',
+  '204': '#4CAF50',
+  '400': '#F44336', // Red for client errors
+  '401': '#F44336',
+  '403': '#F44336',
+  '404': '#F44336',
+  '405': '#F44336',
+  '409': '#F44336',
+  '422': '#F44336',
+  '500': '#FF9800', // Orange for server errors
+  '501': '#FF9800',
+  '502': '#FF9800',
+  '503': '#FF9800',
+  '504': '#FF9800'
 }
 
-const getResponseClass = (status) => {
-  const statusCode = parseInt(status)
-  if (statusCode >= 200 && statusCode < 300) return '$style.success'
-  if (statusCode >= 300 && statusCode < 400) return '$style.redirect'
-  if (statusCode >= 400 && statusCode < 500) return '$style.clientError'
-  if (statusCode >= 500) return '$style.serverError'
-  return ''
+const getMethodBackgroundColor = (method) => {
+  const color = methodColors[method]
+  return color ? `${color}20` : 'transparent' // 20 is hex for 12% opacity
+}
+
+const getStatusColor = (status) => {
+  if (statusColors[status]) return statusColors[status]
+  const statusNum = parseInt(status)
+  if (statusNum >= 200 && statusNum < 300) return '#4CAF50'
+  if (statusNum >= 400 && statusNum < 500) return '#F44336'
+  if (statusNum >= 500) return '#FF9800'
+  return '#9E9E9E' // Default grey for unknown status codes
 }
 
 defineExpose({ setSearchQuery, getMethodBackgroundColor })
@@ -206,8 +271,16 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
                   <h3 :class="$style.sectionTitle">Responses</h3>
                   <div :class="$style.responses">
                     <div v-for="(response, status) in endpoint.responses" :key="status" :class="$style.response">
-                      <div :class="[$style.responseHeader, getResponseClass(response.status)]">
-                        <div :class="$style.responseStatus">{{ status }}</div>
+                      <div :class="$style.responseHeader">
+                        <div 
+                          :class="$style.responseStatus"
+                          :style="{ 
+                            backgroundColor: `${getStatusColor(status)}20`,
+                            color: getStatusColor(status)
+                          }"
+                        >
+                          {{ status }}
+                        </div>
                         <div :class="$style.responseDescription">{{ response.description }}</div>
                       </div>
                       <div v-if="response.content" :class="$style.responseContent">
@@ -569,10 +642,11 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 
 .responseStatus {
   font-family: monospace;
-  font-weight: 500;
+  font-weight: 600;
   padding: $spacing-xs $spacing-sm;
   border-radius: $border-radius-sm;
-  background-color: rgba($text-color, 0.1);
+  min-width: 48px;
+  text-align: center;
 }
 
 .responseDescription {
@@ -582,25 +656,5 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 
 .responseContent {
   padding: $spacing-md;
-}
-
-.success .responseStatus {
-  background-color: rgba($secondary-color, 0.2);
-  color: $secondary-color;
-}
-
-.redirect .responseStatus {
-  background-color: rgba($warning-color, 0.2);
-  color: $warning-color;
-}
-
-.clientError .responseStatus {
-  background-color: rgba($accent-color, 0.2);
-  color: $accent-color;
-}
-
-.serverError .responseStatus {
-  background-color: rgba($error-color, 0.2);
-  color: $error-color;
 }
 </style>

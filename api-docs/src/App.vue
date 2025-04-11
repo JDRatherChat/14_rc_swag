@@ -15,10 +15,8 @@ const projectInfo = ref({
   contactEmail: 'dev@rather.chat'
 })
 
-function handleSearch(query) {
-  if (mainRef.value) {
-    mainRef.value.setSearchQuery(query)
-  }
+const handleSearch = (query) => {
+  mainRef.value?.setSearchQuery(query)
 }
 </script>
 

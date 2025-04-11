@@ -29,10 +29,6 @@ paths:
       summary: "Upload an image"
       description: "Upload a pet image"
       operationId: "uploadPetImage"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
       parameters:
       - name: "petId"
         in: "path"
@@ -50,21 +46,69 @@ paths:
         description: "File to upload"
         required: false
         type: "file"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                additionalMetadata:
+                  type: string
+                  description: "Additional data to pass to server"
+                file:
+                  type: string
+                  format: binary
+                  description: "File to upload"
+            example:
+              additionalMetadata: "Additional data about my dog"
+              file: "(binary)"
       responses:
         '200':
           description: "Successful operation"
           content:
             application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      photoUrls:
+                        type: array
+                        items:
+                          type: string
               example:
                 code: 200
                 type: "success"
                 message: "File uploaded successfully"
-        405:
+                data:
+                  id: 10
+                  photoUrls: ["https://example.com/dog1.jpg"]
+        '405':
           description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+              example:
+                code: 405
+                type: "error"
+                message: "Invalid input provided"
   /pet:
     post:
       tags:
@@ -72,21 +116,37 @@ paths:
       summary: "Add a new pet to the store"
       description: ""
       operationId: "addPet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
+      requestBody:
         description: "Pet object that needs to be added to the store"
         required: true
-        schema:
-          $ref: "#/definitions/Pet"
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/Pet"
+            example:
+              id: 10
+              name: "doggie"
+              category:
+                id: 1
+                name: "Dogs"
+              photoUrls:
+                - "https://example.com/dog1.jpg"
+              tags:
+                - id: 1
+                  name: "friendly"
+              status: "available"
       responses:
-        405:
+        '200':
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Pet"
+              example:
+                id: 10
+                name: "doggie"
+                status: "available"
+        '405':
           description: "Invalid input"
       security:
       - petstore_auth:
@@ -137,22 +197,47 @@ paths:
         in: "query"
         description: "Status values that need to be considered for filter"
         required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+            - "available"
+            - "pending"
+            - "sold"
           default: "available"
-        collectionFormat: "multi"
       responses:
-        200:
+        '200':
           description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/definitions/Pet"
+              example:
+                - id: 10
+                  name: "doggie"
+                  category:
+                    id: 1
+                    name: "Dogs"
+                  photoUrls:
+                    - "https://example.com/dog1.jpg"
+                  tags:
+                    - id: 1
+                      name: "friendly"
+                  status: "available"
+                - id: 11
+                  name: "kitty"
+                  category:
+                    id: 2
+                    name: "Cats"
+                  photoUrls:
+                    - "https://example.com/cat1.jpg"
+                  tags:
+                    - id: 2
+                      name: "independent"
+                  status: "pending"
         400:
           description: "Invalid status value"
       security:
@@ -200,9 +285,6 @@ paths:
       summary: "Find pet by ID"
       description: "Returns a single pet"
       operationId: "getPetById"
-      produces:
-      - "application/json"
-      - "application/xml"
       parameters:
       - name: "petId"
         in: "path"
@@ -211,16 +293,58 @@ paths:
         type: "integer"
         format: "int64"
       responses:
-        200:
+        '200':
           description: "successful operation"
-          schema:
-            $ref: "#/definitions/Pet"
-        400:
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Pet"
+              example:
+                id: 10
+                name: "doggie"
+                category:
+                  id: 1
+                  name: "Dogs"
+                photoUrls:
+                  - "https://example.com/dog1.jpg"
+                tags:
+                  - id: 1
+                    name: "friendly"
+                status: "available"
+        '400':
           description: "Invalid ID supplied"
-        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+              example:
+                code: 400
+                type: "error"
+                message: "Invalid pet ID supplied"
+        '404':
           description: "Pet not found"
-      security:
-      - api_key: []
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+              example:
+                code: 404
+                type: "error"
+                message: "Pet not found"
     post:
       tags:
       - "pet"
@@ -314,26 +438,34 @@ paths:
       summary: "Place an order for a pet"
       description: ""
       operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/Order"
+            example:
+              id: 10
+              petId: 198772
+              quantity: 1
+              shipDate: "2025-04-11T14:07:17Z"
+              status: "placed"
+              complete: true
       responses:
         200:
           description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Order"
+              example:
+                id: 10
+                petId: 198772
+                quantity: 1
+                shipDate: "2025-04-11T14:07:17Z"
+                status: "placed"
+                complete: true
         400:
           description: "Invalid Order"
-  /store/order/{orderId}:
     get:
       tags:
       - "store"
@@ -489,11 +621,6 @@ paths:
       tags:
       - "user"
       summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
       parameters:
       - name: "username"
         in: "query"
@@ -506,7 +633,7 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        '200':
           description: "successful operation"
           headers:
             X-Expires-After:
@@ -517,10 +644,48 @@ paths:
               type: "integer"
               format: "int32"
               description: "calls per hour allowed by the user"
-          schema:
-            type: "string"
-        400:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      expiresIn:
+                        type: integer
+              example:
+                code: 200
+                type: "success"
+                message: "Logged in successfully"
+                data:
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  expiresIn: 3600
+        '400':
           description: "Invalid username/password supplied"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                  type:
+                    type: string
+                  message:
+                    type: string
+              example:
+                code: 400
+                type: "error"
+                message: "Invalid username or password"
   /user/logout:
     get:
       tags:
@@ -566,19 +731,35 @@ paths:
       summary: "Create user"
       description: "This can only be done by the logged in user."
       operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/definitions/User"
+            example:
+              id: 10
+              username: "john_doe"
+              firstName: "John"
+              lastName: "Doe"
+              email: "john@email.com"
+              password: "12345"
+              phone: "+1-202-555-0192"
+              userStatus: 1
       responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/User"
+              example:
+                id: 10
+                username: "john_doe"
+                firstName: "John"
+                lastName: "Doe"
+                email: "john@email.com"
+                phone: "+1-202-555-0192"
+                userStatus: 1
         default:
           description: "successful operation"
 
