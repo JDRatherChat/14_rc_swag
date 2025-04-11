@@ -37,4 +37,13 @@ function handleSearch(query) {
   background-color: $background-color;
   color: $text-color;
 }
+
+#app {
+  background-color: $background-color;
+  color: $text-color;
+  min-height: 100vh;
+  font-family: $font-family-base;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 </style>

@@ -44,6 +44,7 @@ function handleSearch(event) {
 @import '../../../assets/styles/index.scss';
 
 .header {
+  grid-area: header;
   position: fixed;
   top: 0;
   left: 0;
@@ -52,16 +53,18 @@ function handleSearch(event) {
   background-color: $background-color;
   border-bottom: 1px solid $border-color;
   z-index: 100;
+  display: flex;
+  justify-content: center;
 }
 
 .container {
-  max-width: $container-max-width;
+  width: 80vw;
   height: 100%;
-  margin: 0 auto;
-  padding: 0 $spacing-xl;
   display: flex;
   align-items: center;
-  gap: $spacing-xl;
+  justify-content: space-between;
+  padding-left: calc($spacing-xl + 32px + #{$spacing-sm});
+  gap: $spacing-md;
 }
 
 .titleContainer {
@@ -79,9 +82,11 @@ function handleSearch(event) {
 }
 
 .title {
-  font-size: $font-size-xl;
+  font-size: calc($font-size-xl + 6px);
+  font-weight: 600;
   color: $text-color;
   margin: 0;
+  text-decoration: none;
 }
 
 .downloadButton {

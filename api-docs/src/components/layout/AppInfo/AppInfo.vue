@@ -1,55 +1,57 @@
 <script setup>
-defineProps({
-  projectName: {
-    type: String,
-    required: true
-  },
-  version: {
-    type: String,
-    required: true
-  },
-  oasVersion: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  termsOfService: {
-    type: String,
-    default: ''
-  },
-  contactEmail: {
-    type: String,
-    default: ''
+import { computed } from 'vue'
+import { useOpenApi } from '../../../composables/useOpenApi'
+
+const { loading, error, getApiInfo } = useOpenApi()
+
+const apiInfo = computed(() => getApiInfo())
+
+const openTos = () => {
+  window.open('/tos.md', '_blank')
+}
+
+const contactDeveloper = () => {
+  if (apiInfo.value?.contact?.email) {
+    window.location.href = `mailto:${apiInfo.value.contact.email}`
+  } else if (apiInfo.value?.contact?.url) {
+    window.open(apiInfo.value.contact.url, '_blank')
   }
-})
+}
 </script>
 
 <template>
   <section :class="$style.info">
-    <div :class="$style.container">
-      <div :class="$style.metadata">
-        <h2 :class="$style.projectName">{{ projectName }}</h2>
+    <div v-if="loading" :class="$style.loading">Loading API information...</div>
+    <div v-else-if="error" :class="$style.error">{{ error }}</div>
+    <div v-else-if="apiInfo" :class="$style.content">
+      <div :class="$style.row">
+        <h1 :class="$style.title">{{ apiInfo.title }}</h1>
         <div :class="$style.versions">
-          <span :class="$style.version">Documentation v{{ version }}</span>
+          <span :class="$style.version">v{{ apiInfo.version }}</span>
           <span :class="$style.separator">•</span>
-          <span :class="$style.oasVersion">OpenAPI {{ oasVersion }}</span>
-        </div>
-      </div>
-      
-      <div :class="$style.content">
-        <p v-if="description" :class="$style.description">{{ description }}</p>
-        <div v-if="termsOfService" :class="$style.terms">
-          <a :href="termsOfService" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+          <span :class="$style.version">OAS {{ apiInfo.openApiVersion }}</span>
         </div>
       </div>
 
-      <div v-if="contactEmail" :class="$style.contact">
-        <a :href="`mailto:${contactEmail}`" :class="$style.contactLink">
+      <p v-if="apiInfo.description" :class="$style.description">
+        {{ apiInfo.description }}
+      </p>
+
+      <div :class="$style.actions">
+        <button 
+          v-if="apiInfo.termsOfService" 
+          :class="$style.button"
+          @click="openTos"
+        >
+          Terms of Service
+        </button>
+        <button 
+          v-if="apiInfo.contact" 
+          :class="[$style.button, $style.primary]"
+          @click="contactDeveloper"
+        >
           Contact Developer
-        </a>
+        </button>
       </div>
     </div>
   </section>
@@ -59,100 +61,99 @@ defineProps({
 @import '../../../assets/styles/index.scss';
 
 .info {
-  background-color: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid $border-color;
-  padding: $spacing-xl 0;
-  margin-top: $header-height;
-  text-align: left;
-}
-
-.container {
-  width: 80vw;
-  margin: 0 auto;
+  grid-area: info;
+  padding: $spacing-xl;
   padding-left: calc($spacing-xl + 32px + #{$spacing-sm}); /* Match AppMain padding */
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-xl;
-  text-align: left;
+  border-bottom: 1px solid $border-color;
+  background-color: lighten($background-color, 2%); /* Slightly lighter than background */
+  margin-top: calc($spacing-xl / 2); /* Reduced margin by half */
 }
 
-.metadata {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  text-align: left;
+.loading, .error {
+  color: $text-color;
+  font-size: $font-size-md;
 }
 
-.projectName {
-  font-size: $font-size-2xl;
+.error {
+  color: $accent-color;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  margin-top: $spacing-md;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xl;
   font-weight: 600;
   color: $text-color;
   margin: 0;
-  text-align: left;
 }
 
 .versions {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
-  color: rgba($text-color, 0.7);
+}
+
+.version {
   font-size: $font-size-sm;
-  text-align: left;
+  color: $secondary-color;
+  padding: $spacing-xs $spacing-sm;
+  background-color: rgba($secondary-color, 0.1);
+  border-radius: $border-radius-sm;
 }
 
 .separator {
   color: rgba($text-color, 0.3);
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-  text-align: left;
-}
-
 .description {
-  color: rgba($text-color, 0.9);
   font-size: $font-size-md;
-  line-height: 1.6;
+  color: $text-color;
+  opacity: 0.9;
   margin: 0;
-  max-width: 800px;
+  line-height: 1.5;
   text-align: left;
+  max-width: 800px; /* Limit width for better readability */
 }
 
-.terms {
-  text-align: left;
-  
-  a {
-    color: $secondary-color;
-    text-decoration: none;
-    font-size: $font-size-sm;
-    text-align: left;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+.actions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-sm;
 }
 
-.contact {
-  margin-top: $spacing-md;
-  text-align: left;
-}
-
-.contactLink {
-  display: inline-block;
-  color: $secondary-color;
-  text-decoration: none;
+.button {
+  padding: $spacing-sm $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background-color: transparent;
+  color: $text-color;
   font-size: $font-size-sm;
-  padding: $spacing-xs $spacing-sm;
-  border: 1px solid $secondary-color;
-  border-radius: $border-radius-sm;
+  cursor: pointer;
   transition: all $transition-fast;
-  text-align: left;
 
   &:hover {
-    background-color: rgba($secondary-color, 0.1);
+    background-color: rgba($text-color, 0.05);
+  }
+
+  &.primary {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    color: white;
+
+    &:hover {
+      background-color: darken($primary-color, 5%);
+    }
   }
 }
 </style>
