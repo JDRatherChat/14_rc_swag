@@ -14,8 +14,8 @@ function setSearchQuery(query) {
 const filteredEndpoints = computed(() => {
   const query = searchQuery.value.toLowerCase()
   if (!query) return endpoints.value
-  
-  return endpoints.value.filter(endpoint => 
+
+  return endpoints.value.filter(endpoint =>
     endpoint.path.toLowerCase().includes(query) ||
     endpoint.description?.toLowerCase().includes(query) ||
     endpoint.method.toLowerCase().includes(query)
@@ -54,9 +54,9 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
       <div v-else-if="error" :class="$style.error">{{ error }}</div>
       <div v-else-if="endpoints.length === 0" :class="$style.empty">No endpoints found</div>
       <template v-else>
-        <div 
-          v-for="endpoint in filteredEndpoints" 
-          :key="`${endpoint.method}-${endpoint.path}`" 
+        <div
+          v-for="endpoint in filteredEndpoints"
+          :key="`${endpoint.method}-${endpoint.path}`"
           :class="$style.endpoint"
           :style="{ backgroundColor: getMethodBackgroundColor(endpoint.method) }"
         >
@@ -151,7 +151,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
 }
 
 .container {
-  padding: $spacing-xl;
+  padding: $spacing-sm;
   padding-top: calc($spacing-xl / 2); // Reduced top padding to match AppInfo margin
   display: flex;
   flex-direction: column;
@@ -389,7 +389,7 @@ defineExpose({ setSearchQuery, getMethodBackgroundColor })
   margin: 0;
   overflow-x: auto;
   text-align: left;
-  
+
   code {
     white-space: pre;
     color: $text-color;

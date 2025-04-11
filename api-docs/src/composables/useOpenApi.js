@@ -1,5 +1,5 @@
-import { ref, onMounted } from 'vue'
 import yaml from 'js-yaml'
+import { onMounted, ref } from 'vue'
 
 export function useOpenApi() {
   const apiSpec = ref(null)
@@ -11,11 +11,11 @@ export function useOpenApi() {
     try {
       loading.value = true
       error.value = null
-      
-      const response = await fetch('/endpoints.yaml')
+
+      const response = await fetch('/test.yaml')
       const yamlText = await response.text()
       apiSpec.value = yaml.load(yamlText)
-      
+
       // Process endpoints after loading
       processEndpoints()
     } catch (e) {
@@ -36,7 +36,9 @@ export function useOpenApi() {
       description: apiSpec.value.info.description,
       openApiVersion: apiSpec.value.openapi,
       termsOfService: apiSpec.value.info.termsOfService,
-      contact: apiSpec.value.info.contact
+      privacyPolicy: apiSpec.value.info.privacyPolicy,
+      contact: apiSpec.value.info.contact,
+      servers: apiSpec.value.servers || []
     }
   }
 
@@ -114,7 +116,7 @@ export function useOpenApi() {
     const yamlStr = yaml.dump(apiSpec.value)
     const blob = new Blob([yamlStr], { type: 'text/yaml' })
     const url = URL.createObjectURL(blob)
-    
+
     const a = document.createElement('a')
     a.href = url
     a.download = 'openapi-spec.yaml'

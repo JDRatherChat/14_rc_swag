@@ -1,23 +1,25 @@
-openapi: 3.1.0
+openapi: 3.1.1
 info:
-  title: RatherChat API
-  description: RatherChat API documentation for developers
-  version: 1.0.7
-  termsOfService: /tos.md
+  title: "Test API"
+  version: "1.0.0"
+  description: "RatherChat's API documentation for managing users, chats, and messages."
+  termsOfService: "/tos.md"
   contact:
-    email: dev@rather.chat
+    name: "RatherChat API Support"
+    url: "https://ratherchat.com/support"
+    email: "api@ratherchat.com"
 
 servers:
-  - url: https://api.rather.chat/v1
+  - url: https://api.ratherchat.com/v1
     description: Production server
-  - url: https://staging-api.rather.chat/v1
+  - url: https://staging-api.ratherchat.com/v1
     description: Staging server
 
 paths:
   /users:
     get:
-      summary: List all users
-      description: Retrieve a list of all registered users
+      summary: Testing the yaml
+      description: Retrieve a paginated list of users
       operationId: listUsers
       parameters:
         - name: page
@@ -26,6 +28,7 @@ paths:
           required: false
           schema:
             type: integer
+            minimum: 1
             default: 1
         - name: limit
           in: query
@@ -33,34 +36,35 @@ paths:
           required: false
           schema:
             type: integer
-            default: 10
+            minimum: 1
+            maximum: 100
+            default: 20
       responses:
         '200':
           description: A list of users
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  users:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/User'
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                example:
-                  users:
-                    - id: "123"
-                      username: "john_doe"
-                      email: "john@example.com"
-                  total: 50
-                  page: 1
-
+              example:
+                users:
+                  - id: "123"
+                    username: "john_doe"
+                    email: "john@example.com"
+                total: 50
+                page: 1
+        '404':
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                users:
+                  - id: "123"
+                    username: "john_doe"
+                    email: "john@example.com"
+                total: 50
+                page: 1
     post:
       summary: Create a new user
-      description: Register a new user in the system
+      description: Create a new user account
       operationId: createUser
       requestBody:
         required: true
@@ -75,38 +79,47 @@ paths:
               properties:
                 username:
                   type: string
+                  minLength: 3
                 email:
                   type: string
                   format: email
                 password:
                   type: string
-                  format: password
+                  minLength: 8
+            example:
+              username: "john_doe"
+              email: "john@example.com"
+              password: "securepass123"
       responses:
         '201':
           description: User created successfully
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+              example:
+                id: "123"
+                username: "john_doe"
+                email: "john@example.com"
+                createdAt: "2025-04-10T20:00:00Z"
 
   /chats:
     get:
-      summary: List user chats
-      description: Get all chats for the authenticated user
+      summary: List user's chats
+      description: Retrieve a list of chats for the authenticated user
       operationId: listChats
       responses:
         '200':
-          description: List of chats
+          description: A list of chats
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Chat'
-
+              example:
+                chats:
+                  - id: "chat123"
+                    name: "Project Discussion"
+                    lastMessage: "See you tomorrow!"
+                    updatedAt: "2025-04-10T19:30:00Z"
     post:
-      summary: Create new chat
-      description: Start a new chat session
+      summary: Create a new chat
+      description: Create a new chat room or direct message
       operationId: createChat
       requestBody:
         required: true
@@ -115,33 +128,41 @@ paths:
             schema:
               type: object
               required:
+                - name
                 - participants
               properties:
+                name:
+                  type: string
                 participants:
                   type: array
                   items:
                     type: string
-                title:
-                  type: string
+            example:
+              name: "Project Discussion"
+              participants: ["user123", "user456"]
       responses:
         '201':
           description: Chat created successfully
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Chat'
+              example:
+                id: "chat123"
+                name: "Project Discussion"
+                participants: ["user123", "user456"]
+                createdAt: "2025-04-10T20:00:00Z"
 
   /messages/{chatId}:
+    parameters:
+      - name: chatId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       summary: Get chat messages
       description: Retrieve messages from a specific chat
       operationId: getChatMessages
       parameters:
-        - name: chatId
-          in: path
-          required: true
-          schema:
-            type: string
         - name: before
           in: query
           description: Get messages before this timestamp
@@ -153,21 +174,16 @@ paths:
           description: List of messages
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message'
-
+              example:
+                messages:
+                  - id: "msg123"
+                    content: "Hello team!"
+                    sender: "user123"
+                    timestamp: "2025-04-10T19:30:00Z"
     post:
       summary: Send message
-      description: Send a new message to a chat
+      description: Send a new message to the chat
       operationId: sendMessage
-      parameters:
-        - name: chatId
-          in: path
-          required: true
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -179,62 +195,73 @@ paths:
               properties:
                 content:
                   type: string
-                attachments:
-                  type: array
-                  items:
-                    type: string
+                  maxLength: 2000
+            example:
+              content: "Hello team!"
       responses:
         '201':
           description: Message sent successfully
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
+              example:
+                id: "msg123"
+                content: "Hello team!"
+                sender: "user123"
+                timestamp: "2025-04-10T20:00:00Z"
 
   /notifications:
     get:
       summary: Get notifications
       description: Retrieve user notifications
       operationId: getNotifications
-      parameters:
-        - name: unreadOnly
-          in: query
-          schema:
-            type: boolean
-            default: false
       responses:
         '200':
           description: List of notifications
           content:
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Notification'
-
+              example:
+                notifications:
+                  - id: "notif123"
+                    type: "message"
+                    content: "New message in Project Discussion"
+                    read: false
+                    createdAt: "2025-04-10T19:30:00Z"
     patch:
-      summary: Mark notifications as read
-      description: Mark multiple notifications as read
-      operationId: markNotificationsRead
+      summary: Update notifications
+      description: Mark notifications as read
+      operationId: updateNotifications
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - ids
               properties:
-                notificationIds:
+                ids:
                   type: array
                   items:
                     type: string
+            example:
+              ids: ["notif123", "notif124"]
       responses:
         '200':
-          description: Notifications marked as read successfully
+          description: Notifications updated successfully
+          content:
+            application/json:
+              example:
+                updated: 2
+                timestamp: "2025-04-10T20:00:00Z"
 
 components:
   schemas:
     User:
       type: object
+      required:
+        - id
+        - username
+        - email
       properties:
         id:
           type: string
@@ -242,58 +269,67 @@ components:
           type: string
         email:
           type: string
+          format: email
         createdAt:
           type: string
           format: date-time
 
     Chat:
       type: object
+      required:
+        - id
+        - name
+        - participants
       properties:
         id:
           type: string
-        title:
+        name:
           type: string
         participants:
           type: array
           items:
-            $ref: '#/components/schemas/User'
-        createdAt:
+            type: string
+        lastMessage:
+          type: string
+        updatedAt:
           type: string
           format: date-time
-        lastMessage:
-          $ref: '#/components/schemas/Message'
 
     Message:
       type: object
+      required:
+        - id
+        - content
+        - sender
+        - timestamp
       properties:
         id:
           type: string
-        chatId:
-          type: string
-        sender:
-          $ref: '#/components/schemas/User'
         content:
           type: string
-        attachments:
-          type: array
-          items:
-            type: string
-        createdAt:
+        sender:
+          type: string
+        timestamp:
           type: string
           format: date-time
 
     Notification:
       type: object
+      required:
+        - id
+        - type
+        - content
       properties:
         id:
           type: string
         type:
           type: string
-          enum: [MESSAGE, MENTION, SYSTEM]
+          enum: [message, mention, system]
         content:
           type: string
         read:
           type: boolean
+          default: false
         createdAt:
           type: string
           format: date-time

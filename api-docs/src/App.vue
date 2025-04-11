@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import AppHeader from './components/layout/AppHeader/AppHeader.vue'
 import AppInfo from './components/layout/AppInfo/AppInfo.vue'
 import AppMain from './components/layout/AppMain/AppMain.vue'
+import AppServers from './components/layout/AppServers/AppServers.vue'
 
 const mainRef = ref(null)
 const projectInfo = ref({
@@ -25,6 +26,7 @@ function handleSearch(query) {
   <div :class="$style.app">
     <AppHeader :onSearch="handleSearch" />
     <AppInfo v-bind="projectInfo" />
+    <AppServers />
     <AppMain ref="mainRef" />
   </div>
 </template>
