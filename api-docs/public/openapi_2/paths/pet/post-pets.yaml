@@ -1,0 +1,16 @@
+post:
+  summary: "Adds a new pet"
+  tags:
+    - pet
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas.yaml#/Pet'
+  responses:
+    '201':
+      description: "Pet created successfully"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/Pet'

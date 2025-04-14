@@ -1,0 +1,4 @@
+- url: 'https://api.petstore.com/v1'
+  description: 'Production server'
+- url: 'https://api-staging.petstore.com/v1'
+  description: 'Staging server'

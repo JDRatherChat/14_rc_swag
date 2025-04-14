@@ -1,0 +1,30 @@
+post:
+  summary: "Place an order for a pet"
+  tags:
+    - store
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            petId:
+              type: integer
+            quantity:
+              type: integer
+  responses:
+    '200':
+      description: "Order placed successfully"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              petId:
+                type: integer
+              quantity:
+                type: integer
+    '400':
+      description: "Invalid order"

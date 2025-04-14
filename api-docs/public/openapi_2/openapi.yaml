@@ -1,0 +1,12 @@
+# openapi: 3.1.0
+# info:
+#   $ref: './info.yaml'
+# servers:
+#   $ref: './servers.yaml'
+# tags:
+#   $ref: './tags.yaml'
+# paths:
+#   $ref: './paths/'
+# components:
+#   $ref: './components/'
+

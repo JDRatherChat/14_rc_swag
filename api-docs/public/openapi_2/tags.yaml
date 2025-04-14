@@ -1,0 +1,7 @@
+- name: pet
+  description: 'Operations related to pets'
+- name: store
+  description: 'Operations related to pet store orders'
+- name: user
+  description: 'Operations related to users'
+

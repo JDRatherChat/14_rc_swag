@@ -1,0 +1,20 @@
+get:
+  summary: "Returns a pet by ID"
+  tags:
+    - pet
+  parameters:
+    - name: petId
+      in: path
+      required: true
+      description: "ID of the pet to fetch"
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: "A pet object"
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas.yaml#/Pet'
+    '404':
+      description: "Pet not found"

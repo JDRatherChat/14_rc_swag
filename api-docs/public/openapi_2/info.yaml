@@ -1,0 +1,10 @@
+title: Petstore API
+version: 1.0.0
+description: A sample Petstore API to demonstrate the modular OpenAPI structure
+contact:
+  name: Petstore Support
+  url: http://www.petstore.com/support
+  email: support@petstore.com
+license:
+  name: MIT
+  url: http://opensource.org/licenses/MIT

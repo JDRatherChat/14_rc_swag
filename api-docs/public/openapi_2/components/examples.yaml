@@ -1,0 +1,5 @@
+PetExample:
+  value:
+    id: 1
+    name: "Fluffy"
+    tag: "cat"

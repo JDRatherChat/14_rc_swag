@@ -13,5 +13,7 @@ servers:
   - url: https://bot-service.rather.chat/api/docs/
     description: Base URL
 
-tags:
-  $ref: "openapi/tags.yaml"
+# $ref: "openapi/tags.yaml#/tags"
+
+
+$ref: "openapi/paths.yaml/paths"

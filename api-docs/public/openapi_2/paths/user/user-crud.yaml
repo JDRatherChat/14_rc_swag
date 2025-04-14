@@ -1,0 +1,36 @@
+get:
+  summary: "Returns a list of users"
+  tags:
+    - user
+  responses:
+    '200':
+      description: "A list of users"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                username:
+                  type: string
+                email:
+                  type: string
+delete:
+  summary: "Deletes a user by ID"
+  tags:
+    - user
+  parameters:
+    - name: userId
+      in: path
+      required: true
+      description: "ID of the user to delete"
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: "User deleted successfully"
+    '404':
+      description: "User not found"

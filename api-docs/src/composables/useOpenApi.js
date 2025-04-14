@@ -13,7 +13,7 @@ export function useOpenApi() {
       error.value = null
 
       // Load and parse the main OpenAPI file
-      const mainResponse = await fetch('/test.yaml')
+      const mainResponse = await fetch('test.yaml')
       const mainYaml = await mainResponse.text()
       const mainSpec = yaml.load(mainYaml)
 

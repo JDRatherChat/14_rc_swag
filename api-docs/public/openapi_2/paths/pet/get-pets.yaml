@@ -1,0 +1,13 @@
+get:
+  summary: "Returns a list of pets"
+  tags:
+    - pet
+  responses:
+    '200':
+      description: "A list of pets"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components/schemas.yaml#/Pet'

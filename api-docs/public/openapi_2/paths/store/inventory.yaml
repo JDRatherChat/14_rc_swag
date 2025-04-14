@@ -1,0 +1,13 @@
+get:
+  summary: "Returns pet store inventory"
+  tags:
+    - store
+  responses:
+    '200':
+      description: "Inventory details"
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties:
+              type: integer
